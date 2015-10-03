@@ -1,2 +1,1 @@
 # scholarcloud
-*.pyc
