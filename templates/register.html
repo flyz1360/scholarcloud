@@ -1,0 +1,20 @@
+﻿﻿{% extends "base.html" %}
+
+{% block content %}
+    {% if errors %}
+        <ul>
+            {% for error in errors %}
+            <li>{{ error }}</li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+
+    <form action="register" method="post" align="center">
+    {% csrf_token %}
+        用户名：<input type="text" name="username" value = "{{ username }}"/><br/>
+        密码：<input type="password" name="password" /><br/>
+        重复密码：<input type="password" name="password-repeat" /><br/>
+        邮箱：<input type="text" name="email" /><br/>
+        <input type="submit" value="注册" />
+    </form>
+{% endblock %}

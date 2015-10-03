@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<title>{% block title %}清云加速{% endblock %}</title>
+
+    <!-- ========================= base css ========================= -->
+    <link rel="stylesheet" href="/css/base.css">
+
+    {% block external_css %}
+	<!-- ========================= external css ========================= -->
+    {% endblock %}
+
+    {% block exteral_js %}
+	<!-- ========================= external javascript ========================= -->
+    {% endblock %}
+
+    {% block custom_css %}
+        <!-- ========================= custom css ========================= -->
+    {% endblock %}
+
+    {% block custom_js %}
+        <!-- ========================= custom javascript ========================= -->
+    {% endblock %}
+</head>
+<body>
+    {% block content %}{% endblock %}
+    {% block footer %}
+	<!-- 页脚 -->
+	<footer>
+		<div class="container">
+			<!--<p><a target="_blank" href="http://tns.thss.tsinghua.edu.cn/">Institute of TNS, School of Software</a>, Tsinghua University &copy; 2015</p>-->
+		</div>
+	</footer>
+    {% endblock %}
+</body>
+</html>

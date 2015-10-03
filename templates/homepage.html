@@ -1,0 +1,11 @@
+﻿﻿{% extends "base.html" %}
+
+{% block content %}
+    <p align="center">欢迎{{ user.username}}<a href="/" > 登出</a></p>
+    {% if proxyaccount.month <= 0 %}
+        <p align="center">您尚未缴费，请点击<a href="pay" >缴费</a></p>
+    {% else %}
+        <p align="center">您还有{{ proxyaccount.month }}月剩余</p>
+        <p align="center">账户信息...</p>
+    {% endif %}
+{% endblock %}
