@@ -68,7 +68,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'thuproxy',
         'USER': 'root',
-        'PASSWORD': 'root',
+        'PASSWORD': 'thuproxy',
         'HOST': '127.0.0.1',
     }
 }
