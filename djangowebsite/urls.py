@@ -14,17 +14,15 @@ Including another URLconf
     2. Add a URL to urlpatterns:  url(r'^blog/', include(blog_urls))
 """
 from django.conf.urls import *
-from thuproxy.views import *
+from django.contrib import admin
+admin.autodiscover()
 
-urlpatterns = patterns('',
-                       # ('^hello/$', hello),
-                       # ('^display_meta/$', display_meta),
-                       ('^$', homepage),
-                       ('^register$', register),
-                       ('^login', login),
 
-                       # (r'^search-form/$', search_form),
-                       # (r'^search/$', search),
-                       (r'^contact/$', contact),
-                       # url(r'^admin/', include(admin.site.urls)),
+urlpatterns = patterns('thuproxy.views',
+                       ('^$', 'index'),
+                       ('^register/$', 'register'),
+                       ('^login/$', 'login'),
+                       ('^logout/$', 'user_logout'),
+                       ('^homepage/$', 'homepage'),
+                       (r'^admin/', include(admin.site.urls)),
 )

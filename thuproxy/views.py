@@ -2,46 +2,38 @@ from django.http import HttpResponse, HttpResponseRedirect
 import datetime
 from django.shortcuts import render_to_response, RequestContext
 from thuproxy.models import *
+from django.contrib import auth
+from django.contrib.auth.decorators import login_required
 
 __author__ = 'lz'
 
 
-def hello(request):
-    now = datetime.datetime.now()
-    html = "<html><body>it is now %s.</body></html>" % now
-    return HttpResponse(html)
-
-
-def homepage(request):
-    return render_to_response('index.html')
+def index(request):
+    return render_to_response('index.html', locals(), context_instance=RequestContext(request))
 
 
 def register(request):
     errors = []
     if request.method == 'POST':
-        if not request.POST.get('username', ''):
-            errors.append('Enter a username.')
-        if not request.POST.get('password', ''):
-            errors.append('Enter a password.')
-        if request.POST.get('email') and '@' not in request.POST['email']:
-            errors.append('Enter a valid e-mail address.')
-        if not errors:
+        if request.POST.get('username', '') and request.POST.get('password', ''):
             username = request.POST.get('username', '')
             password = request.POST.get('password', '')
-            email = request.POST.get('email', '')
+            if User.objects.filter(username=username).count() == 0:
+                new_user = User.objects.create_user(username=username, password=password)
+                duser = DUser(user=new_user)
+                if request.POST.get('email'):
+                    email = request.POST.get('email', '')
+                    duser.email = email
 
-            proxyaccount = ProxyAccount(username=username,
-                                        type=0,
-                                        month=0,
-                                        port=0,)
-            proxyaccount.save()
+                proxyaccount = ProxyAccount(type=0, month=0, port=0)
+                proxyaccount.save()
+                duser.save()
+                return HttpResponseRedirect('/')
+            else:
+                errors.append('用户名已存在')
+        else:
+                errors.append('请填写完整')
 
-            user = User(username=username,
-                        password=password,
-                        email=email,
-                        )
-            user.save()
-            return HttpResponseRedirect('/')
     return render_to_response('register.html', {
         'errors': errors,
         'username': request.POST.get('username', ''),
@@ -52,17 +44,31 @@ def register(request):
 
 
 def login(request):
-    if request.method == 'GET':
-        if request.GET['username'] and request.GET['password']:
-            username = request.GET['username']
-            password = request.GET['password']
+    if request.method == 'POST':
+        if request.POST['username'] and request.POST['password']:
+            username = request.POST['username']
+            password = request.POST['password']
+            user = auth.authenticate(username=username, password=password)
+            if user is not None:
+                auth.login(request, user)
+                request.session['user_id'] = user.id
+                return HttpResponseRedirect('/homepage/')
+    return render_to_response('index.html', locals(), context_instance=RequestContext(request))
 
-            user = User.objects.get(username=username)
-            proxyaccount = ProxyAccount.objects.get(username=username)
-            if user.password == password:
-                return render_to_response('homepage.html', locals())
+
+@login_required(login_url="/login/")
+def homepage(request):
+    return render_to_response('homepage.html', locals(), context_instance=RequestContext(request))
+
+
+@login_required
+def user_logout(request):
+    try:
+        del request.session['user_id']
+    except KeyError:
+        pass
+    auth.logout(request)
     return HttpResponseRedirect('/')
-
 
 # def display_meta(request):
 #     values = request.META.items()
@@ -91,22 +97,3 @@ def login(request):
 #         {'error': error})
 #
 #
-def contact(request):
-    errors = []
-    if request.method == 'POST':
-        if not request.POST.get('subject', ''):
-            errors.append('Enter a subject.')
-        if not request.POST.get('message', ''):
-            errors.append('Enter a message.')
-        if request.POST.get('email') and '@' not in request.POST['email']:
-            errors.append('Enter a valid e-mail address.')
-        if not errors:
-
-            return HttpResponseRedirect('/contact/thanks/')
-    return render_to_response('contact_form.html', {
-        'errors': errors,
-        'subject': request.POST.get('subject', ''),
-        'message': request.POST.get('message', ''),
-        'email': request.POST.get('email', ''),
-    },
-     context_instance=RequestContext(request))

@@ -31,10 +31,10 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = (
-    #'django.contrib.admin',
-    #'django.contrib.auth',
-    #'django.contrib.contenttypes',
-    #'django.contrib.sessions',
+    'django.contrib.admin',
+    'django.contrib.auth',
+    'django.contrib.contenttypes',
+    'django.contrib.sessions',
     #'django.contrib.messages',
     #'django.contrib.staticfiles',
     'thuproxy',
@@ -50,6 +50,10 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'django.middleware.security.SecurityMiddleware',
 )
+
+SESSION_COOKIE_AGE = 60*60
+
+LOGIN_URL = '/'
 
 ROOT_URLCONF = 'djangowebsite.urls'
 
@@ -70,6 +74,7 @@ DATABASES = {
         'USER': 'root',
         'PASSWORD': 'thuproxy',
         'HOST': '127.0.0.1',
+        'OPTIONS': {'init_command': 'SET storage_engine=MyISAM', },
     }
 }
 
