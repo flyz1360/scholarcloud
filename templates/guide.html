@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true" style="margin-bottom: 60px">
+  <div class="panel panel-default">
+    <div class="panel-heading" role="tab" id="headingOne">
+      <h4 class="panel-title">
+        <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+          Chrome配置
+        </a>
+      </h4>
+    </div>
+    <div id="collapseOne" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="headingOne">
+      <div class="panel-body">
+        <p>
+            1.下载浏览器插件Proxy SwitchySharp <a href="https://chrome.google.com/webstore/detail/proxy-switchysharp/dpplabbmogkhghncfbfdeeokoefdjegm?utm_source=chrome-ntp-icon">下载地址</a>
+        </p>
+          <img src="/static/imgs/chrome/chrome1.png"  class="img-rounded" width="400">
+       <p>
+            2.浏览器地址栏后方出现地球形状图标，说明安装成功。点击选项按钮，进入配置界面
+        </p>
+          <img src="/static/imgs/chrome/chrome2.png"  class="img-rounded" width="300">
+          <p>
+            3.在配置界面新建情景模式，名称为“学术代理”，选择自动配置，在输入框里输{pac文件url}，并点击保存
+        </p>
+          <img src="/static/imgs/chrome/chrome3.png"  class="img-rounded" width="600">
+          <p>
+            4.再次点击SwitchySharp的球形图标，选择刚刚配置的“学术代理”情景模式，之后就可以顺畅地访问Google Scholar等网站
+        </p>
+          <img src="/static/imgs/chrome/chrome4.png"  class="img-rounded" width="300">
+      </div>
+    </div>
+  </div>
+  <div class="panel panel-default">
+    <div class="panel-heading" role="tab" id="headingTwo">
+      <h4 class="panel-title">
+        <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+          IE配置
+        </a>
+      </h4>
+    </div>
+    <div id="collapseTwo" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingTwo">
+      <div class="panel-body">
+       <p>
+            IE浏览器 > Internet选项 > 连接 > 局域网设置：
+        </p>
+          <img src="/static/imgs/IE/ie1.png"  class="img-rounded" width="500">
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}

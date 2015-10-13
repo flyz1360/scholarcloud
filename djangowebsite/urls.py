@@ -24,5 +24,6 @@ urlpatterns = patterns('thuproxy.views',
                        ('^login/$', 'login'),
                        ('^logout/$', 'user_logout'),
                        ('^homepage/$', 'homepage'),
+                       ('^guide/$', 'guide'),
                        (r'^admin/', include(admin.site.urls)),
 )

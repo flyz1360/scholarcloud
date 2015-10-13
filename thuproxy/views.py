@@ -10,11 +10,23 @@ __author__ = 'lz'
 
 
 def index(request):
+    userLoginSuccess = request.user.is_authenticated()
+    user = request.user
+    pageName = "index"
     return render_to_response('index.html', locals(), context_instance=RequestContext(request))
 
-
+def guide(request):
+    userLoginSuccess = request.user.is_authenticated()
+    user = request.user
+    pageName = "guide"
+    return render_to_response('guide.html', locals(), context_instance=RequestContext(request))
 def register(request):
     errors = []
+    try:
+        del request.session['user_id']
+    except KeyError:
+        pass
+    auth.logout(request)
     if request.method == 'POST':
         if request.POST.get('username', '') and request.POST.get('password', ''):
             username = request.POST.get('username', '')
@@ -45,6 +57,7 @@ def register(request):
 
 
 def login(request):
+
     if request.method == 'POST':
         if request.POST['username'] and request.POST['password']:
             username = request.POST['username']
@@ -59,6 +72,9 @@ def login(request):
 
 @login_required(login_url="/login/")
 def homepage(request):
+    userLoginSuccess = request.user.is_authenticated()
+    user = request.user
+    pageName = "homepage"
     return render_to_response('homepage.html', locals(), context_instance=RequestContext(request))
 
 
