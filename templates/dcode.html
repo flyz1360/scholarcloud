@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <form action="/inputDcode/" method="post" align="center">
+    {% csrf_token %}
+        <div>
+            <label>请输入优惠码：</label>
+            <input type="text" name="dcode" placeholder="优惠码">
+            <button type="submit">确定</button>
+            {% if error == True %}
+            <li >优惠码不正确</li>
+            {% endif %}
+        </div>
+    </form>
+{% endblock %}

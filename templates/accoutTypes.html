@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true" style="margin-bottom: 60px">
+  <div class="panel panel-default">
+    <div class="panel-heading" role="tab" id="headingOne">
+      <h4 class="panel-title">
+        <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseOne" aria-expanded="false" aria-controls="collapseOne">
+          体验用户
+        </a>
+      </h4>
+    </div>
+    <div id="collapseOne" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingOne">
+      <div class="panel-body">
+          <p>
+            每月流量：1GB。
+          </p>
+          <p>
+            连接数：1.
+          </p>
+          <p>
+            每月资费：2元。
+          </p>
+      </div>
+    </div>
+  </div>
+
+  <div class="panel panel-default">
+    <div class="panel-heading" role="tab" id="headingTwo">
+      <h4 class="panel-title">
+        <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+          普通用户
+        </a>
+      </h4>
+    </div>
+    <div id="collapseTwo" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingTwo">
+      <div class="panel-body">
+          <p>
+            每月流量：10G。
+          </p>
+          <p>
+            连接数：5。
+          </p>
+          <p>
+            每月资费：10元。
+          </p>
+      </div>
+    </div>
+  </div>
+
+  <div class="panel panel-default">
+    <div class="panel-heading" role="tab" id="headingThree">
+      <h4 class="panel-title">
+        <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+          VIP用户
+        </a>
+      </h4>
+    </div>
+    <div id="collapseThree" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingThree">
+      <div class="panel-body">
+          <p>
+            每月流量：不限。
+          </p>
+          <p>
+            连接数：不限。
+          </p>
+          <p>
+            每月资费：50元。
+          </p>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}
