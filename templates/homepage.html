@@ -11,5 +11,6 @@
             <p align="center">您的账户为：<a href="/accoutTypes/" title="查看资费说明">VIP用户</a></p>
         {% endif %}
         <p align="center">还有{{ proxyaccount.month }}月剩余使用时间 <a href="/pay/">续费</a></p>
+        <p align="center">自动配置URL：<input type="text" disabled="true " value="http://scholar.thucloud.com/static/myproxy.pac"> <input type="button" value="点击复制"></p>
     {% endif %}
 {% endblock %}
