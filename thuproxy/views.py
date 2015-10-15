@@ -11,21 +11,29 @@ __author__ = 'lz'
 
 def index(request):
     userLoginSuccess = request.user.is_authenticated()
-    user = request.user
+    if userLoginSuccess is True:
+        user = request.user
+    else:
+        user = None
     pageName = "index"
     return render_to_response('index.html', locals(), context_instance=RequestContext(request))
+
 
 def guide(request):
     userLoginSuccess = request.user.is_authenticated()
     user = request.user
     pageName = "guide"
     return render_to_response('guide.html', locals(), context_instance=RequestContext(request))
+
+def accoutTypes(request):
+    userLoginSuccess = request.user.is_authenticated()
+    user = request.user
+    pageName = "accoutTypes"
+    return render_to_response('accoutTypes.html', locals(), context_instance=RequestContext(request))
+
+
 def register(request):
     errors = []
-    try:
-        del request.session['user_id']
-    except KeyError:
-        pass
     auth.logout(request)
     if request.method == 'POST':
         if request.POST.get('username', '') and request.POST.get('password', ''):
@@ -37,10 +45,9 @@ def register(request):
                 if request.POST.get('email'):
                     email = request.POST.get('email', '')
                     duser.email = email
-
-                proxyaccount = ProxyAccount(type=0, month=0, port=0)
-                proxyaccount.save()
                 duser.save()
+                proxyaccount = ProxyAccount(user=new_user, type=0, month=0, port=0)
+                proxyaccount.save()
                 return HttpResponseRedirect('/')
             else:
                 errors.append('用户名已存在')
@@ -57,7 +64,7 @@ def register(request):
 
 
 def login(request):
-
+    user = None
     if request.method == 'POST':
         if request.POST['username'] and request.POST['password']:
             username = request.POST['username']
@@ -65,7 +72,6 @@ def login(request):
             user = auth.authenticate(username=username, password=password)
             if user is not None:
                 auth.login(request, user)
-                request.session['user_id'] = user.id
                 return HttpResponseRedirect('/homepage/')
     return render_to_response('index.html', locals(), context_instance=RequestContext(request))
 
@@ -73,19 +79,54 @@ def login(request):
 @login_required(login_url="/login/")
 def homepage(request):
     userLoginSuccess = request.user.is_authenticated()
-    user = request.user
+    duser = DUser.objects.get(user=request.user)
     pageName = "homepage"
+    proxyaccount = ProxyAccount.objects.get(user=request.user)
+    type1 = proxyaccount.type
     return render_to_response('homepage.html', locals(), context_instance=RequestContext(request))
 
 
-@login_required
+@login_required(login_url="/login/")
 def user_logout(request):
-    try:
-        del request.session['user_id']
-    except KeyError:
-        pass
     auth.logout(request)
     return HttpResponseRedirect('/')
+
+
+@login_required(login_url="/login/")
+def pay(request):
+    userLoginSuccess = request.user.is_authenticated()
+    return render_to_response('pay.html', locals(), context_instance=RequestContext(request))
+
+
+@login_required(login_url="/login/")
+def dcode(request):
+    userLoginSuccess = request.user.is_authenticated()
+    return render_to_response('dcode.html', locals(), context_instance=RequestContext(request))
+
+
+@login_required(login_url="/login/")
+def inputDcode(request):
+    userLoginSuccess = request.user.is_authenticated()
+    error = False
+    if request.method == 'POST':
+        if request.POST.get('dcode', ''):
+            dcode = request.POST['dcode']
+            if dcode == '12345':
+                proxyaccount = ProxyAccount.objects.get(user=request.user)
+                proxyaccount.type = 1
+                proxyaccount.month = 1
+                proxyaccount.save()
+                return render_to_response('homepage.html', locals(), context_instance=RequestContext(request))
+            elif dcode == '23456':
+                proxyaccount = ProxyAccount.objects.get(user=request.user)
+                proxyaccount.type = 2
+                proxyaccount.month = 12
+                proxyaccount.save()
+                return render_to_response('homepage.html', locals(), context_instance=RequestContext(request))
+            else:
+                error = True
+                return render_to_response('dcode.html', locals(), context_instance=RequestContext(request))
+    return HttpResponseRedirect('/dcode')
 
 # def display_meta(request):
 #     values = request.META.items()
