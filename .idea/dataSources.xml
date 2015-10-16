@@ -6,7 +6,7 @@
       <jdbc-driver>com.mysql.jdbc.Driver</jdbc-driver>
       <jdbc-url>jdbc:mysql://127.0.0.1/thuproxy</jdbc-url>
       <user-name>root</user-name>
-      <user-password>dff0dfd9dfdedfc8dfc0df98df9adf9bdf99</user-password>
+      <user-password>dfdedfc2dfdfdfdadfd8dfc5dfd2dfd3</user-password>
       <libraries />
     </data-source>
   </component>
