@@ -72,10 +72,10 @@ DATABASES = {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'thuproxy',
         'USER': 'root',
-        # 'PASSWORD': 'Zstbj2013',
-        'PASSWORD': 'thuproxy',
+        'PASSWORD': 'Zstbj2013',
+        # 'PASSWORD': 'thuproxy',
         'HOST': '127.0.0.1',
-        'OPTIONS': {'init_command': 'SET storage_engine=MyISAM', },
+        # 'OPTIONS': {'init_command': 'SET storage_engine=MyISAM', },
     }
 }
 

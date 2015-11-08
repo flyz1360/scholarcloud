@@ -5,10 +5,7 @@
       <driver-ref>mysql</driver-ref>
       <jdbc-driver>com.mysql.jdbc.Driver</jdbc-driver>
       <jdbc-url>jdbc:mysql://127.0.0.1/thuproxy</jdbc-url>
-      <user-name>root</user-name>
-      <user-password>dfdedfc2dfdfdfdadfd8dfc5dfd2dfd3</user-password>
       <libraries />
     </data-source>
   </component>
 </project>
-
