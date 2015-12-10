@@ -4,11 +4,8 @@
     <data-source source="LOCAL" name="Django default" uuid="0a6a39f0-fb40-419c-9159-04f75028b0c7">
       <driver-ref>mysql</driver-ref>
       <jdbc-driver>com.mysql.jdbc.Driver</jdbc-driver>
-      <jdbc-url>jdbc:mysql://127.0.0.1/thuproxy</jdbc-url>
-      <user-name>root</user-name>
-      <user-password>dfdedfc2dfdfdfdadfd8dfc5dfd2dfd3</user-password>
+      <jdbc-url>jdbc:mysql://127.0.0.1/iDashBoard</jdbc-url>
       <libraries />
     </data-source>
   </component>
 </project>
-

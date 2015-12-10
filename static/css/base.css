@@ -1,6 +1,9 @@
+
 body {
-  padding-top: 70px;
-  padding-bottom: 30px;
+  padding-top: 90px;
+  padding-bottom: 0px;
+  font-size: 16px;
+  font-family: "Helvetica Neue",helvetica,'lucida grande','lucida sans unicode',lucida,'Hiragino Sans GB','Microsoft YaHei','WenQuanYi Micro Hei',sans-serif;
 }
 
 .theme-dropdown .dropdown-menu {
@@ -17,6 +20,15 @@ body {
   width: auto;
 }
 
+.navbar {
+  padding: 10px 0px;
+  font-size: 18px;
+}
+
+.navbar-brand {
+    padding: 0px 50px  0px 0px;
+}
+
 /* Sticky footer styles
 -------------------------------------------------- */
 html {
@@ -25,25 +37,24 @@ html {
 }
 body {
   /* Margin bottom by footer height */
-  margin-bottom: 60px;
+  margin-bottom: 50px;
 }
 .footer {
   position: absolute;
   bottom: 0;
   width: 100%;
   /* Set the fixed height of the footer here */
-  height: 60px;
+  height: auto;
   background-color: #f5f5f5;
 }
 
-.carousel-inner{
-    background:url(imgs/bg_ban.jpg);
-}
 .container .text-muted {
-  margin: 20px 0;
+  text-align: center;
+  margin: 15px 0;
 }
 
 .footer > .container {
   padding-right: 15px;
   padding-left: 15px;
 }
+

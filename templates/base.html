@@ -11,10 +11,9 @@
 	<title>{% block title %}清云加速{% endblock %}</title>
 
     <!-- ========================= base css ========================= -->
-    <link rel="stylesheet" href="/static/base.css">
     <link rel="stylesheet" href="/static/bootstrap-3.3.5-dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="/static/bootstrap-3.3.5-dist/css/bootstrap-theme.css">
-
+    <link rel="stylesheet" href="/static/css/base.css">
     <!-- ========================= base js ========================= -->
     <script type="text/javascript" src="/static/js/jquery-1.11.3.min.js"></script>
     <script type="text/javascript" src="/static/bootstrap-3.3.5-dist/js/bootstrap.min.js"></script>
@@ -41,64 +40,73 @@
     {% endblock %}
 </head>
 <body>
-    <!-- Fixed navbar -->
-    <nav class="navbar navbar-inverse navbar-fixed-top">
-      <div class="container">
-        <div class="navbar-header">
-          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
-            <span class="sr-only">Toggle navigation</span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-          </button>
-          <a class="navbar-brand" href="/">Scholar Cloud</a>
-        </div>
-        <div id="navbar" class="navbar-collapse collapse">
-          <ul class="nav navbar-nav">
-            <li {% if pageName == "index" %}class="active"{% endif %}><a href="/homepage">账户管理</a></li>
-            <li {% if pageName == "guide" %}class="active"{% endif %}><a href="/guide">配置说明</a></li>
-            <li {% if pageName == "accoutType" %}class="active"{% endif %}><a href="/accoutTypes">资费说明</a></li>
-          </ul>
 
-            <ul class="nav navbar-nav navbar-right">
+    <div id="fb-root" class=" fb_reset"></div>
+
+    <!-- Fixed navbar -->
+    {% block navigation %}
+    <nav class="navbar navbar-default navbar-fixed-top">
+      <div class="container">
+        <div class="navbar-header ">
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" id="header_logo" href="/" title="ScholarCloud">
+              <img alt="ScholarCloud" src="/static/imgs/logo.png" height="50px" >
+            </a>
+        </div>
+
+        <div id="navbar" class="navbar-collapse collapse">
+            <ul class="nav navbar-nav navbar-middle" style="width: 40%">
+                <li {% if pageName == "homepage" %}class="active"{% endif %} style="width: 33%"><a href="/homepage">账户管理</a></li>
+                <li {% if pageName == "guide" %}class="active"{% endif %} style="width: 33%"><a href="/guide">配置说明</a></li>
+                <li {% if pageName == "accoutType" %}class="active"{% endif %} style="width: 33%"><a href="/accoutTypes">资费说明</a></li>
+            </ul>
+
+            <ul class="nav navbar-nav navbar-right"  style="width: 20%">
                 {% if userLoginSuccess == True %}
                     <li id="fat-menu" class="dropdown">
-              <a id="drop3" href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
-                {{ user.username }}
-                <span class="caret"></span>
-              </a>
-              <ul class="dropdown-menu" aria-labelledby="drop3">
-                <li><a href="/logout">登出</a></li>
-                  <li><a href="/homepage">账户管理</a></li>
-
-              </ul>
-            </li>
-            {% else %}
+                      <a id="drop3" href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+                        {{ user.username }}
+                        <span class="caret"></span>
+                      </a>
+                      <ul class="dropdown-menu" aria-labelledby="drop3">
+                        <li style="width: 50%"><a href="/logout">登出</a></li>
+                        <li style="width: 50%"><a href="/homepage">账户管理</a></li>
+                      </ul>
+                    </li>
+                {% else %}
                     <li><a href="/login">登录</a></li>
-            <li><a href="/register">注册</a></li>
-
-
-                    {% endif %}
-
-          </ul>
+                    <li><a href="/register">注册</a></li>
+                {% endif %}
+            </ul>
         </div><!--/.nav-collapse -->
       </div>
     </nav>
-        <div class="container">
-        {% block content %}{% endblock %}
-        </div>
+
+    {% endblock %}
 
 
-      <footer class="footer">
-      <div class="container">
-        <p class="text-muted">Copyright 2015.</p>
-      </div>
-    </footer>
+    <div class="container">
+        {% block content %}
 
 
+        {% endblock %}
+    </div>
 
 
     {% block footer %}
+        <footer class="footer">
+            <div class="container">
+                <p class="text-muted"><a target="_blank" href="http://tns.thss.tsinghua.edu.cn/">Institute of TNS, School of Software</a>, Tsinghua University &copy; 2015<br>
+                    工信部备案号：京ICP备15063437
+                </p>
+
+            </div>
+        </footer>
     {% endblock %}
 </body>
 </html>

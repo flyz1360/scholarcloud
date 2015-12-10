@@ -2,8 +2,10 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
+      <module fileurl="file://$PROJECT_DIR$/../ThuCloudDisk-master/.idea/ThuCloudDisk.iml" filepath="$PROJECT_DIR$/../ThuCloudDisk-master/.idea/ThuCloudDisk.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/djangowebsite.iml" filepath="$PROJECT_DIR$/.idea/djangowebsite.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../iDashBoardWeb/.idea/iDashBoardWeb.iml" filepath="$PROJECT_DIR$/../iDashBoardWeb/.idea/iDashBoardWeb.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../python/quant/.idea/quant.iml" filepath="$PROJECT_DIR$/../python/quant/.idea/quant.iml" />
     </modules>
   </component>
 </project>
-
