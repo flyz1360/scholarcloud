@@ -21,12 +21,18 @@ body {
 }
 
 .navbar {
+  text-align: center;
   padding: 10px 0px;
   font-size: 18px;
 }
 
 .navbar-brand {
     padding: 0px 50px  0px 0px;
+}
+
+.navbar-nav>li>a {
+  padding-left: 0px;
+  padding-right: 0px;
 }
 
 /* Sticky footer styles

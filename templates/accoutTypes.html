@@ -1,74 +1,18 @@
 {% extends "base.html" %}
 {% block content %}
-<div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true" style="margin-bottom: 60px">
-  <div class="panel panel-default">
-    <div class="panel-heading" role="tab" id="headingOne">
-      <h4 class="panel-title">
-        <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseOne" aria-expanded="false" aria-controls="collapseOne">
-          体验用户
-        </a>
-      </h4>
+    <div style="width: 1000px; margin-left: auto;margin-right: auto">
+        <table class="table table-bordered table-striped">
+            <thead>
+                <tr ><th>#</th><th>用户级别</th><th>每月收费</th><th>每月流量</th></tr>
+            </thead>
+            <tbody>
+                <tr><th>1</th><td>体验用户</td><td>1元</td><td>100MB</td></tr>
+                <tr><th>2</th><td>初级用户</td><td>5元</td><td>1GB</td></tr>
+                <tr><th>3</th><td>普通用户</td><td>10元</td><td>10GB</td></tr>
+                <tr><th>4</th><td>进阶用户</td><td>20元</td><td>25GB</td></tr>
+                <tr><th>5</th><td>VIP用户</td><td>50元</td><td>不限</td></tr>
+            </tbody>
+        </table>
     </div>
-    <div id="collapseOne" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingOne">
-      <div class="panel-body">
-          <p>
-            每月流量：1GB。
-          </p>
-          <p>
-            连接数：1.
-          </p>
-          <p>
-            每月资费：2元。
-          </p>
-      </div>
-    </div>
-  </div>
-
-  <div class="panel panel-default">
-    <div class="panel-heading" role="tab" id="headingTwo">
-      <h4 class="panel-title">
-        <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
-          普通用户
-        </a>
-      </h4>
-    </div>
-    <div id="collapseTwo" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingTwo">
-      <div class="panel-body">
-          <p>
-            每月流量：10G。
-          </p>
-          <p>
-            连接数：5。
-          </p>
-          <p>
-            每月资费：10元。
-          </p>
-      </div>
-    </div>
-  </div>
-
-  <div class="panel panel-default">
-    <div class="panel-heading" role="tab" id="headingThree">
-      <h4 class="panel-title">
-        <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
-          VIP用户
-        </a>
-      </h4>
-    </div>
-    <div id="collapseThree" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingThree">
-      <div class="panel-body">
-          <p>
-            每月流量：不限。
-          </p>
-          <p>
-            连接数：不限。
-          </p>
-          <p>
-            每月资费：50元。
-          </p>
-      </div>
-    </div>
-  </div>
-</div>
 
 {% endblock %}

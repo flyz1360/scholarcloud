@@ -30,10 +30,4 @@ urlpatterns = patterns('thuproxy.views',
                        ('^inputDcode/$', 'inputDcode'),
                        ('^accoutTypes/$', 'accoutTypes'),
                        (r'^admin/', include(admin.site.urls)),
-
-                       (r'^paypal/ipnListener$', 'ipn_listener'),
-
-                       (r'^cancel_checkout$',"cancel_checkout"),
-                       (r'^finish_checkout$',"finish_checkout"),
-
 )
