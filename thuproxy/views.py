@@ -82,9 +82,15 @@ def homepage(request):
     duser = DUser.objects.get(user=request.user)
     pageName = "homepage"
     proxyaccount = ProxyAccount.objects.get(user=request.user)
-    type1 = proxyaccount.type
     return render_to_response('homepage.html', locals(), context_instance=RequestContext(request))
 
+@login_required(login_url="/login/")
+def cancel_checkout(request):
+    return HttpResponseRedirect('/homepage')
+
+@login_required(login_url="/login/")
+def finish_checkout(request):
+    return HttpResponseRedirect('/homepage')
 
 @login_required(login_url="/login/")
 def user_logout(request):
@@ -127,6 +133,7 @@ def inputDcode(request):
                 error = True
                 return render_to_response('dcode.html', locals(), context_instance=RequestContext(request))
     return HttpResponseRedirect('/dcode')
+
 
 # def display_meta(request):
 #     values = request.META.items()
