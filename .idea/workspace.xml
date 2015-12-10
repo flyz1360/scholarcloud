@@ -37,17 +37,34 @@
   </component>
   <component name="FileEditorManager">
     <leaf>
-      <file leaf-file-name="spider.py" pinned="false" current-in-tab="true">
+      <file leaf-file-name="spider.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/../python/quant/quant_lz/spider.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.4244186">
+            <state vertical-scroll-proportion="0.0">
               <caret line="151" column="30" selection-start-line="151" selection-start-column="30" selection-end-line="151" selection-end-column="30" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
+      <file leaf-file-name="settings.py" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/djangowebsite/settings.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="0.9060606">
+              <caret line="77" column="8" selection-start-line="77" selection-start-column="8" selection-end-line="77" selection-end-column="8" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
     </leaf>
+  </component>
+  <component name="IdeDocumentHistory">
+    <option name="CHANGED_PATHS">
+      <list>
+        <option value="$PROJECT_DIR$/djangowebsite/settings.py" />
+      </list>
+    </option>
   </component>
   <component name="JsBuildToolGruntFileManager" detection-done="true" />
   <component name="JsGulpfileManager">
@@ -410,18 +427,18 @@
     <watches-manager />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/djangowebsite/settings.py">
+    <entry file="file://$PROJECT_DIR$/../python/quant/quant_lz/spider.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.16569768">
-          <caret line="10" column="0" selection-start-line="0" selection-start-column="3" selection-end-line="10" selection-end-column="0" />
+        <state vertical-scroll-proportion="0.0">
+          <caret line="151" column="30" selection-start-line="151" selection-start-column="30" selection-end-line="151" selection-end-column="30" />
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/../python/quant/quant_lz/spider.py">
+    <entry file="file://$PROJECT_DIR$/djangowebsite/settings.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.4244186">
-          <caret line="151" column="30" selection-start-line="151" selection-start-column="30" selection-end-line="151" selection-end-column="30" />
+        <state vertical-scroll-proportion="0.9060606">
+          <caret line="77" column="8" selection-start-line="77" selection-start-column="8" selection-end-line="77" selection-end-column="8" />
           <folding />
         </state>
       </provider>
