@@ -1,9 +1,7 @@
 #coding=utf-8
 from django.http import HttpResponse, HttpResponseRedirect
-import datetime
 from django.shortcuts import render_to_response, RequestContext
 from thuproxy.models import *
-from django.contrib import auth
 from django.contrib.auth.decorators import login_required
 
 __author__ = 'lz'
@@ -32,50 +30,6 @@ def accoutTypes(request):
     return render_to_response('accoutTypes.html', locals(), context_instance=RequestContext(request))
 
 
-def register(request):
-    errors = []
-    auth.logout(request)
-    if request.method == 'POST':
-        if request.POST.get('username', '') and request.POST.get('password', ''):
-            username = request.POST.get('username', '')
-            password = request.POST.get('password', '')
-            if User.objects.filter(username=username).count() == 0:
-                new_user = User.objects.create_user(username=username, password=password)
-                duser = DUser(user=new_user)
-                if request.POST.get('email'):
-                    email = request.POST.get('email', '')
-                    duser.email = email
-                duser.save()
-                proxyaccount = ProxyAccount(user=new_user, type=0, month=0, port=0)
-                proxyaccount.save()
-                return HttpResponseRedirect('/')
-            else:
-                errors.append('用户名已存在')
-        else:
-                errors.append('请填写完整')
-
-    return render_to_response('register.html', {
-        'errors': errors,
-        'username': request.POST.get('username', ''),
-        'password': request.POST.get('password', ''),
-        'email': request.POST.get('email', ''),
-    },
-     context_instance=RequestContext(request))
-
-
-def login(request):
-    user = None
-    if request.method == 'POST':
-        if request.POST['username'] and request.POST['password']:
-            username = request.POST['username']
-            password = request.POST['password']
-            user = auth.authenticate(username=username, password=password)
-            if user is not None:
-                auth.login(request, user)
-                return HttpResponseRedirect('/homepage/')
-    return render_to_response('index.html', locals(), context_instance=RequestContext(request))
-
-
 @login_required(login_url="/login/")
 def homepage(request):
     userLoginSuccess = request.user.is_authenticated()
@@ -83,11 +37,6 @@ def homepage(request):
     pageName = "homepage"
     proxyaccount = ProxyAccount.objects.get(user=request.user)
     return render_to_response('homepage.html', locals(), context_instance=RequestContext(request))
-
-@login_required(login_url="/login/")
-def user_logout(request):
-    auth.logout(request)
-    return HttpResponseRedirect('/')
 
 
 @login_required(login_url="/login/")
@@ -125,3 +74,4 @@ def inputDcode(request):
                 error = True
                 return render_to_response('dcode.html', locals(), context_instance=RequestContext(request))
     return HttpResponseRedirect('/dcode')
+

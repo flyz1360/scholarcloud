@@ -10,5 +10,6 @@ class ProxyAccount(models.Model):
     user = models.ForeignKey(User)
     type = models.IntegerField()
     paydate = models.DateField(blank=True, null=True)
-    month = models.IntegerField()
+    expired_date = models.DateField(blank=True, null=True)
     port = models.IntegerField()
+    traffic = models.FloatField()
