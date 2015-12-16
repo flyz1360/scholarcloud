@@ -4,9 +4,10 @@ from django.shortcuts import render_to_response, RequestContext
 from django.contrib import auth
 from django.contrib.auth.decorators import login_required
 from thuproxy.models import *
-from datetime import datetime
-import time
+from thuproxy.alipay_api import *
+import datetime
 import logging
+import uuid
 
 def register(request):
     errors = []
@@ -17,11 +18,12 @@ def register(request):
             password = request.POST.get('password', '')
             if User.objects.filter(username=username).count() == 0:
                 new_user = User.objects.create_user(username=username, password=password)
-                duser = DUser(user=new_user)
+
                 if request.POST.get('email'):
                     email = request.POST.get('email', '')
-                    duser.email = email
-                duser.save()
+                    new_user.email = email
+                # duser = DUser(user=new_user)
+                new_user.save()
                 proxy_account_list = ProxyAccount.objects.order_by("-port")
                 if len(proxy_account_list) == 0:
                     proxyaccount = ProxyAccount(user=new_user, type=0, port=10000, traffic=0)
@@ -60,3 +62,123 @@ def login(request):
 def user_logout(request):
     auth.logout(request)
     return HttpResponseRedirect('/')
+
+@login_required(login_url="/login/")
+def alipay_apply(request):
+    userLoginSuccess = request.user.is_authenticated()
+    # duser = DUser.objects.get(user=request.user)
+    # pageName = "homepage"
+    proxyaccount = ProxyAccount.objects.get(user=request.user)
+
+    return render_to_response('alipay_apply.html', locals(), context_instance=RequestContext(request))
+
+@login_required(login_url="/login/")
+def alipay_submit(request):
+    userLoginSuccess = request.user.is_authenticated()
+    # duser = DUser.objects.get(user=request.user)
+    # user = duser.user
+    user  = request.user
+    print user.email
+    # pageName = "homepage"
+    proxyaccount = ProxyAccount.objects.get(user=request.user)
+    money = request.POST['money']
+    # try:
+    if True:
+        pay = Pay(out_trade_no = uuid.uuid1().hex,user=user,total_fee = money,status = 'U')
+        pay.save()
+        params = {
+            'out_trade_no':pay.out_trade_no,
+            'subject':u'加速学术云',
+            'body':u'代理包月费',
+            'total_fee':str(money)}
+        total_fee = pay.total_fee
+        alipay = Alipay(notifyurl="http://www.thucloud.com/alipay/callback",
+                 returnurl="http://www.thucloud.com/alipay/success",
+                 showurl="http://www.thucloud.com/alipay/success")
+        params.update(alipay.conf)
+        sign = alipay.buildSign(params)
+        return render_to_response('alipay_order.html',locals())
+    # except:
+    #     return HttpResponse('生成帐单错误')
+    return render_to_response('alipay_submit.html', locals(), context_instance=RequestContext(request))
+
+
+def alipay_callback(request):
+    params = request.POST.dict()
+    alipay = Alipay()
+    sign=None
+    if params.has_key('sign'):
+        sign=params['sign']
+    locSign=alipay.buildSign(params)
+
+    if sign==None or locSign!=sign:
+        print "sign error."
+        return HttpResponse("fail")
+
+    if params['trade_status']!='TRADE_FINISHED' and  params['trade_status']!='TRADE_SUCCESS':
+        return HttpResponse("fail")
+
+    else:
+        print "Verify the request is call by alipay.com...."
+        url = verifyURL['https'] + "&partner=%s&notify_id=%s"%(alipay.conf['partner'],params['notify_id'])
+        print url
+        response=urllib2.urlopen(url)
+        html=response.read()
+
+        print "aliypay.com return: %s" % html
+        if html=='true':
+            try:
+                out_trade_no = params['out_trade_no']
+                trade_no = params['trade_no']
+                buyer_id = params['buyer_id']
+                buyer_email = params['buyer_email']
+                total_fee = params['total_fee']
+                pay = Pay.objects.get(out_trade_no = out_trade_no)
+                if pay.status == 'S':
+                    return HttpResponse("success")
+                pay.status = 'S'
+                pay.trade_no = trade_no
+                pay.buyer_id = buyer_id
+                pay.buyer_email = buyer_email
+                pay.total_fee = total_fee
+                pay.save()
+                user = User.objects.get(id = pay.user)
+                proxyaccount = ProxyAccount.objects.get(user=user)
+                if(pay.total_fee == 1):
+                    proxyaccount.type = 1
+                    proxyaccount.traffic = 100*1000
+                elif(pay.total_fee == 5):
+                    proxyaccount.type = 2
+                    proxyaccount.traffic = 1000*1000
+                elif(pay.total_fee == 10):
+                    proxyaccount.type = 3
+                    proxyaccount.traffic = 10*1000*1000
+                elif(pay.total_fee == 20):
+                    proxyaccount.type = 4
+                    proxyaccount.traffic = 25*1000*1000
+                elif(pay.total_fee == 50):
+                    proxyaccount.type = 5
+                    proxyaccount.traffic = 100*1000*1000
+                 # if(proxyaccount.expired_date == None):
+                if True:
+                    today = datetime.datetime.now()
+                    expired_date  = today + datetime.timedelta(30)
+                    print today.strftime('%Y-%m-%d %H:%M:%S')
+                    print expired_date.strftime('%Y-%m-%d %H:%M:%S')
+                    proxyaccount.paydate = today
+                    proxyaccount.expired_date = expired_date
+                proxyaccount.add
+            except:
+                pass
+            return HttpResponse("success")
+
+        return HttpResponse("fail")
+
+
+@login_required(login_url="/login/")
+def alipay_success(request):
+    userLoginSuccess = request.user.is_authenticated()
+    # duser = DUser.objects.get(user=request.user)
+    # pageName = "homepage"
+    proxyaccount = ProxyAccount.objects.get(user=request.user)
+    return render_to_response('alipay_success.html', locals(), context_instance=RequestContext(request))

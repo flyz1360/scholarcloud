@@ -34,4 +34,8 @@ urlpatterns += patterns('thuproxy.user_views',
                         ('^register/$', 'register'),
                         ('^login/$', 'login'),
                         ('^logout/$', 'user_logout'),
-)
+                        (r'^alipay/apply/$','alipay_apply'),
+                        (r'^alipay/submit','alipay_submit'),
+                        (r'^alipay/callback/$','alipay_callback'),
+                        (r'^alipay/success/$','alipay_success'),
+                        )

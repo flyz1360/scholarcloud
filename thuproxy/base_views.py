@@ -33,7 +33,7 @@ def accoutTypes(request):
 @login_required(login_url="/login/")
 def homepage(request):
     userLoginSuccess = request.user.is_authenticated()
-    duser = DUser.objects.get(user=request.user)
+    # duser = DUser.objects.get(user=request.user)
     pageName = "homepage"
     proxyaccount = ProxyAccount.objects.get(user=request.user)
     return render_to_response('homepage.html', locals(), context_instance=RequestContext(request))
