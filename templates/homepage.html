@@ -1,16 +1,17 @@
 ﻿﻿{% extends "base.html" %}
 
 {% block content %}
-    {% if proxyaccount.month <= 0 %}
-        <p align="center">您尚未缴费，请点击<a href="/pay/" >缴费</a></p>
+    proxyaccount
+    {% if proxyaccount.remainTime == None %}
+        <p align="center">您尚未缴费，请点击<a href="/alipay/apply" >缴费</a></p>
         <p align="center">或者<a href="/dcode/" >输入注册码</a></p>
-    {% elif proxyaccount.month > 0 %}
+    {% else %}
         {% if proxyaccount.type == 1 %}
             <p align="center">您的账户为：<a href="/accoutTypes/" title="查看资费说明">体验用户</a></p>
         {% elif proxyaccount.type == 2  %}
             <p align="center">您的账户为：<a href="/accoutTypes/" title="查看资费说明">VIP用户</a></p>
         {% endif %}
-        <p align="center">还有{{ proxyaccount.month }}月剩余使用时间 <a href="/pay/">续费</a></p>
+        <p align="center">剩余时间还有{{ proxyaccount.remainTime }}, <a href="/alipay/apply">续费</a></p>
         <p align="center">自动配置URL：<input type="text" disabled="true " value="http://scholar.thucloud.com/static/myproxy.pac"> <input type="button" value="点击复制"></p>
     {% endif %}
 {% endblock %}

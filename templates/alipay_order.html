@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block content %}
+
+    <div class="container">
+        <div class="panel panel-default">
+          <div class="panel-heading">
+              <p class="text-center"><span style="font-size:30px;color:rgb(153,153,153);">清云加速充值订单</span></p> </div>
+          <div class="panel-body">
+              <div class="col-md-6 col-md-offset-3">
+            <table class="table table-bordered">
+                <tbody>
+                    <tr><td>用户帐号</td><td>{{ user.username }}</td></tr>
+                    <tr><td>用户邮箱</td><td>{{ user.email }}</td></tr>
+                    <tr><td>帐单号</td><td>{{ params.out_trade_no }}</td></tr>
+                    <tr><td>充值金额</td><td>{{ money }}</td></tr>
+                      <tr><td></td><td>
+                    <form name='alipaysubmit' action='https://www.alipay.com/cooperate/gateway.do?_input_charset=UTF-8' method='POST'>
+                    <input type='hidden' name='body' value='{{ params.body }}' />
+                    <input type='hidden' name='seller_email' value='scholarcloudpay@163.com' />
+                    <input type='hidden' name='service' value='create_direct_pay_by_user' />
+                    <input type='hidden' name='show_url' value='{{ alipay.conf.show_url }}' />
+                    <input type='hidden' name='sign' value='{{ sign }}' />
+                    <input type='hidden' name='out_trade_no' value='{{ params.out_trade_no }}' />
+                    <input type='hidden' name='payment_type' value='1' />
+                    <input type='hidden' name='total_fee' value='{{ total_fee }}' />
+                    <input type='hidden' name='sign_type' value='MD5' />
+                    <input type='hidden' name='notify_url' value='{{ alipay.conf.notify_url }}' />
+                    <input type='hidden' name='partner' value='2088121355152995' />
+                    <input type='hidden' name='return_url' value='{{ alipay.conf.return_url }}' />
+                    <input type='hidden' name='subject' value='{{ params.subject }}' />
+                    <input type="submit" class="btn btn-primary" value="确认，支付宝付款">
+                    <a class="btn btn-default" href="/alipay/apply">取消</a>
+                </form>
+              </td></tr>
+          </tbody>
+        </table>
+        </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

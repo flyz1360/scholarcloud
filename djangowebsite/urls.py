@@ -15,14 +15,12 @@ Including another URLconf
 """
 from django.conf.urls import *
 from django.contrib import admin
+
 admin.autodiscover()
 
 
-urlpatterns = patterns('thuproxy.views',
+urlpatterns = patterns('thuproxy.base_views',
                        ('^$', 'index'),
-                       ('^register/$', 'register'),
-                       ('^login/$', 'login'),
-                       ('^logout/$', 'user_logout'),
                        ('^homepage/$', 'homepage'),
                        ('^guide/$', 'guide'),
                        ('^pay/$', 'pay'),
@@ -31,3 +29,13 @@ urlpatterns = patterns('thuproxy.views',
                        ('^accoutTypes/$', 'accoutTypes'),
                        (r'^admin/', include(admin.site.urls)),
 )
+
+urlpatterns += patterns('thuproxy.user_views',
+                        ('^register/$', 'register'),
+                        ('^login/$', 'login'),
+                        ('^logout/$', 'user_logout'),
+                        (r'^alipay/apply/$','alipay_apply'),
+                        (r'^alipay/submit','alipay_submit'),
+                        (r'^alipay/callback$','alipay_callback'),
+                        (r'^alipay/success$','alipay_success'),
+                        )
