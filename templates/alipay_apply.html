@@ -1,11 +1,12 @@
 {% extends "base.html" %}
 
 {% block content %}
-
+<div class="col-md-4 col-md-offset-4">
     <form method = "post" action="/alipay/submit">
     {% csrf_token %}
-        <input type="hidden" name="money" value="0.1"/>
-        <label>包月费用：0.1元</label>
-        <input type="submit" value="提交">
+        <input type="hidden" name="money" value="1"/>
+        <label>10G流量包月费用：1元</label>
+        <button class="btn btn-success"  type="submit">购买</button>
     </form>
+</div>
 {% endblock %}

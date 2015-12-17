@@ -44,6 +44,7 @@ def homepage(request):
         if(datetime.datetime.now().date() <= proxyaccount.expired_date):
             print ('ok')
             proxyaccount.remainTime = proxyaccount.expired_date - datetime.datetime.now().date()
+            proxyaccount.remainTime = str(proxyaccount.remainTime).replace('days, 0:00:00','天')
         else:
             proxyaccount.remainTime = None
     else:
@@ -70,18 +71,15 @@ def inputDcode(request):
     if request.method == 'POST':
         if request.POST.get('dcode', ''):
             dcode = request.POST['dcode']
-            if dcode == '12345':
+            if dcode == '123456':
                 proxyaccount = ProxyAccount.objects.get(user=request.user)
                 proxyaccount.type = 1
-                proxyaccount.month = 1
+                today = datetime.datetime.now()
+                expired_date  = today + datetime.timedelta(30)
+                proxyaccount.paydate = today
+                proxyaccount.expired_date = expired_date
                 proxyaccount.save()
-                return render_to_response('homepage.html', locals(), context_instance=RequestContext(request))
-            elif dcode == '23456':
-                proxyaccount = ProxyAccount.objects.get(user=request.user)
-                proxyaccount.type = 2
-                proxyaccount.month = 12
-                proxyaccount.save()
-                return render_to_response('homepage.html', locals(), context_instance=RequestContext(request))
+                return HttpResponseRedirect('/homepage')
             else:
                 error = True
                 return render_to_response('dcode.html', locals(), context_instance=RequestContext(request))

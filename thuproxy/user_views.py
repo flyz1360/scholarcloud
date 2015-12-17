@@ -90,7 +90,7 @@ def alipay_submit(request):
         pay.save()
         params = {
             'out_trade_no':pay.out_trade_no,
-            'subject':u'加速学术云',
+            'subject':u'清云加速',
             'body':u'代理包月费',
             'total_fee':str(money)}
         total_fee = pay.total_fee
@@ -153,8 +153,7 @@ def alipay_callback(request):
                 proxyaccount = ProxyAccount.objects.get(user=pay.user)
                 print ('proxyaccount',proxyaccount)
                 print ('pay total fee',pay.total_fee)
-                if(pay.total_fee == 0.1):
-                    print ('type 1 account')
+                if(pay.total_fee == 1):
                     proxyaccount.type = 1
                     proxyaccount.traffic = 100*1000
                 elif(pay.total_fee == 5):
