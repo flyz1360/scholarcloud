@@ -21,11 +21,8 @@ admin.autodiscover()
 
 urlpatterns = patterns('thuproxy.base_views',
                        ('^$', 'index'),
-                       ('^homepage/$', 'homepage'),
+                       # ('^homepage/$', 'homepage'),
                        ('^guide/$', 'guide'),
-                       ('^pay/$', 'pay'),
-                       ('^dcode/$', 'dcode'),
-                       ('^inputDcode/$', 'inputDcode'),
                        ('^accoutTypes/$', 'accoutTypes'),
                        (r'^admin/', include(admin.site.urls)),
 )
@@ -34,8 +31,17 @@ urlpatterns += patterns('thuproxy.user_views',
                         ('^register/$', 'register'),
                         ('^login/$', 'login'),
                         ('^logout/$', 'user_logout'),
+                        )
+
+urlpatterns += patterns('thuproxy.pay_views',
                         (r'^alipay/apply/$','alipay_apply'),
                         (r'^alipay/submit','alipay_submit'),
                         (r'^alipay/callback$','alipay_callback'),
                         (r'^alipay/success$','alipay_success'),
+                        ('^dcode/$', 'dcode'),
+                        ('^inputDcode/$', 'inputDcode'),
+                        )
+
+urlpatterns += patterns('thuproxy.proxy_account_views',
+                        (r'^homepage/$','homepage'),
                         )

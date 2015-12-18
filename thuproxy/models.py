@@ -13,6 +13,7 @@ class ProxyAccount(models.Model):
     expired_date = models.DateField(blank=True, null=True)
     port = models.IntegerField()
     traffic = models.FloatField()
+    pac_no = models.CharField(blank=True, null=True, max_length=255)
 
 class Pay(models.Model):
     out_trade_no = models.CharField(max_length=255)
