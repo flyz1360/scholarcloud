@@ -1,6 +1,7 @@
 #coding=utf-8
 from thuproxy.models import *
 from thuproxy.alipay_api import *
+from thuproxy.proxy_account_views import *
 import datetime
 import uuid
 import urllib.request
@@ -119,14 +120,14 @@ def alipay_callback(request):
                             expired_date = today + datetime.timedelta(30*int(month))
                         if proxyaccount.paydate is not None:
                             print("init paydate")
+                            create_pac(proxyaccount)
+                            open_listen_port(proxyaccount.port)
                             proxyaccount.paydate = today
                         proxyaccount.expired_date = expired_date
                 else:
                     return HttpResponse("fail")
 
-                if True:
-                    today = datetime.datetime.now()
-                print(proxyaccount)
+                print("sava proxyaccount")
                 proxyaccount.save()
             return HttpResponse("success")
 

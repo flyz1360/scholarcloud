@@ -36,6 +36,10 @@ label.error {
     padding: 0px 50px  0px 0px;
 }
 
+.dropdown-menu>li>a{
+  font-size: 16px;
+}
+
 .navbar-nav>li>a {
   padding-left: 0px;
   padding-right: 0px;

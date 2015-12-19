@@ -46,11 +46,6 @@ def homepage(request):
     pageName = "homepage"
     proxyaccount = ProxyAccount.objects.get(user=request.user)
 
-    # 付费完但没有生成pac文件和开通端口
-    if proxyaccount.paydate is not None and proxyaccount.pac_no is None:
-        create_pac(proxyaccount)
-        open_listen_port(proxyaccount.port)
-
     if proxyaccount.expired_date is not None:
         if datetime.datetime.now().date() <= proxyaccount.expired_date:
             print('ok')
