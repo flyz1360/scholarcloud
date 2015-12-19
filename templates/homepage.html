@@ -11,7 +11,7 @@
             <p align="center">您的账户为：<a href="/accoutTypes/" title="查看资费说明">VIP用户</a></p>
         {% endif %}
         <p align="center">您的10G套餐剩余时间还有{{ proxyaccount.remainTime }} <!-- <a href="/alipay/apply">续费</a></p>-->
-        <p align="center">代理配置URL：<label>http://scholar.thucloud.com/pac/{{ proxyaccount.pac_no }}.pac</label><!--<input type="text" disabled="true " value="http://www.thucloud.com/static/myproxy.pac"> <input type="button" value="点击复制">--></p>
+        <p align="center">代理配置URL：<label>http://pac.scholar.thucloud.com/{{ proxyaccount.pac_no }}.pac</label><!--<input type="text" disabled="true " value="http://www.thucloud.com/static/myproxy.pac"> <input type="button" value="点击复制">--></p>
        <p align="center">详情请查看<a href="/guide">配置说明</a></p>
     {% endif %}
 {% endblock %}
