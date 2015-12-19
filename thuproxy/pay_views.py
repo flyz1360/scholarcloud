@@ -109,7 +109,7 @@ def alipay_callback(request):
                     if account_type not in {1,5,10,20,50}:
                         return HttpResponse("fail")
                     else:
-                        print("success:",pay_type," month",month)
+                        print("success:",account_type," month",month)
                         proxyaccount.type = account_type
                         today = datetime.datetime.now()
                         if proxyaccount.expired_date is not None:
@@ -118,7 +118,7 @@ def alipay_callback(request):
                         else:
                             print("init month")
                             expired_date = today + datetime.timedelta(30*int(month))
-                        if proxyaccount.paydate is not None:
+                        if proxyaccount.paydate is None:
                             print("init paydate")
                             create_pac(proxyaccount)
                             open_listen_port(proxyaccount.port)
