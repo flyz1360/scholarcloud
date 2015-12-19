@@ -37,9 +37,9 @@ def alipay_submit(request):
             'body':u'流量购买费用',
             'total_fee':str(money)}
         total_fee = pay.total_fee
-        alipay = Alipay(notifyurl="http://www.thucloud.com/alipay/callback",
-                 returnurl="http://www.thucloud.com/alipay/success",
-                 showurl="http://www.thucloud.com/alipay/success")
+        alipay = Alipay(notifyurl="http://scholar.thucloud.com/alipay/callback",
+                 returnurl="http://scholar.thucloud.com/alipay/success",
+                 showurl="http://scholar.thucloud.com/alipay/success")
         params.update(alipay.conf)
         sign = alipay.buildSign(params)
         return render_to_response('alipay_order.html',locals())
@@ -76,7 +76,6 @@ def alipay_callback(request):
         print("aliypay.com return: %s" % html)
         if html == b'true':
             print('result is true')
-            #try:
             if True:
                 out_trade_no = params['out_trade_no']
                 trade_no = params['trade_no']
@@ -93,37 +92,40 @@ def alipay_callback(request):
                 pay.total_fee = float(total_fee)
                 pay.save()
                 print ('payuser',pay.user)
-                #user = User.objects.get(id = pay.user)
                 proxyaccount = ProxyAccount.objects.get(user=pay.user)
                 print ('proxyaccount',proxyaccount)
                 print ('pay total fee',pay.total_fee)
-                if(pay.total_fee == 1):
-                    proxyaccount.type = 1
-                    proxyaccount.traffic = 100*1000
-                elif(pay.total_fee == 5):
-                    proxyaccount.type = 2
-                    proxyaccount.traffic = 1000*1000
-                elif(pay.total_fee == 10):
-                    proxyaccount.type = 3
-                    proxyaccount.traffic = 10*1000*1000
-                elif(pay.total_fee == 20):
-                    proxyaccount.type = 4
-                    proxyaccount.traffic = 25*1000*1000
-                elif(pay.total_fee == 50):
-                    proxyaccount.type = 5
-                    proxyaccount.traffic = 100*1000*1000
-                 # if(proxyaccount.expired_date == None):
+                month = pay.month
+                pay_type = pay.type
+                if pay_type == 1:
+                    account_type = int(float(total_fee)*100)/int(month)
+                    print("accounttype"+account_type)
+                    if account_type not in {1,2,3,4,5}:
+                        return HttpResponse("fail")
+                    else:
+                        print("success:"+pay_type+" month"+month)
+                        proxyaccount.type = account_type
+                        today = datetime.datetime.now()
+                        if proxyaccount.expired_date is not None:
+                            print("add month")
+                            expired_date = proxyaccount.expired_date + datetime.timedelta(30*int(month))
+                        else:
+                            print("init month")
+                            expired_date = today + datetime.timedelta(30*int(month))
+                        if proxyaccount.paydate is not None:
+                            print("init paydate")
+                            proxyaccount.paydate = today
+                        proxyaccount.expired_date = expired_date
+                else:
+                    return HttpResponse("fail")
+
                 if True:
                     today = datetime.datetime.now()
                     expired_date  = today + datetime.timedelta(30)
-                    print (today.strftime('%Y-%m-%d %H:%M:%S'))
-                    print (expired_date.strftime('%Y-%m-%d %H:%M:%S'))
                     proxyaccount.paydate = today
                     proxyaccount.expired_date = expired_date
                 print(proxyaccount)
                 proxyaccount.save()
-            #except:
-                #pass
             return HttpResponse("success")
 
         return HttpResponse("fail")
