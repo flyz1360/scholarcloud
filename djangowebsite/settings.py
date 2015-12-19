@@ -52,7 +52,7 @@ MIDDLEWARE_CLASSES = (
     # 'django.middleware.security.SecurityMiddleware',
 )
 
-SESSION_COOKIE_AGE = 60*60
+# SESSION_COOKIE_AGE = 60*60
 
 LOGIN_URL = '/'
 

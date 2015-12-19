@@ -14,6 +14,10 @@ def index(request):
         user = request.user
     else:
         user = None
+    if 'username' in request.session:
+        username = request.session['username']
+    else:
+        username = ''
     pageName = "index"
     return render_to_response('index.html', locals(), context_instance=RequestContext(request))
 

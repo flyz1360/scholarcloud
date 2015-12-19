@@ -31,6 +31,7 @@ urlpatterns += patterns('thuproxy.user_views',
                         ('^register/$', 'register'),
                         ('^login/$', 'login'),
                         ('^logout/$', 'user_logout'),
+                        ('^validateUserName/$', 'validate_username')
                         )
 
 urlpatterns += patterns('thuproxy.pay_views',

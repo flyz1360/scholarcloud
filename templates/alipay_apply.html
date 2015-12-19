@@ -1,12 +1,64 @@
 {% extends "base.html" %}
 
+    {% block custom_js %}
+        <script type="text/javascript" src="/static/js/pay.js"></script>
+    {% endblock %}
+
 {% block content %}
-<div class="col-md-4 col-md-offset-4">
+<div class="form-horizontal">
+    <div class="form-group">
+        <lable class="col-xs-10 col-xs-offset-2 col-sm-3 col-md-2 control-label" >选择账户类型：</lable>
+
+        <div class="col-xs-10 col-xs-offset-2 col-sm-6 col-sm-offset-0">
+            <label class="radio-inline">
+                <input type="radio" name="accoutType" id="inlineRadio1" value="1">1元
+            </label>
+            <label class="radio-inline">
+                <input type="radio" name="accoutType" id="inlineRadio2" value="5" checked>5元
+            </label>
+            <label class="radio-inline">
+                <input type="radio" name="accoutType" id="inlineRadio3" value="10">10元
+            </label>
+            <label class="radio-inline">
+                <input type="radio" name="accoutType" id="inlineRadio4" value="20">20元
+            </label>
+            <label class="radio-inline">
+                <input type="radio" name="accoutType" id="inlineRadio5" value="50">50元
+            </label>
+        </div>
+    </div>
+
+
+    <div class="form-group">
+        <lable class="col-xs-10 col-xs-offset-2 col-sm-3 col-md-2 control-label" >选择购买月数：</lable>
+
+        <div class="col-xs-4 col-xs-offset-2 col-sm-3 col-md-2 col-sm-offset-0">
+            <select id="monthSelect" class="form-control ">
+                <option selected>1</option>
+                <option>2</option>
+                <option>3</option>
+                <option>4</option>
+                <option>5</option>
+                <option>6</option>
+                <option>8</option>
+                <option>12</option>
+            </select>
+        </div>
+        <lable class="col-xs-1 control-label" style="text-align: left">月</lable>
+    </div>
+
     <form method = "post" action="/alipay/submit">
-    {% csrf_token %}
-        <input type="hidden" name="money" value="1"/>
-        <label>10G流量包月费用：1元</label>
-        <button class="btn btn-success"  type="submit">购买</button>
+        {% csrf_token %}
+        <div class="form-group">
+            <lable class="col-xs-10 col-xs-offset-2 col-sm-3 col-md-2 control-label" >共需支付：</lable>
+            <div class="col-xs-4 col-xs-offset-2  col-sm-3 col-md-2 col-sm-offset-0">
+                <input class="form-control" id="money" type="text" name="money" value="5" readonly>
+            </div>
+            <lable class="control-label" style="text-align: left;padding-left: 15px;">元</lable>
+            <button class="btn btn-success" style="width: 80px; margin-left: 20px" type="submit">购买</button>
+        </div>
+        <input type="hidden" name="type" value="1">
+        <input type="hidden" id="month" name="month" value="1">
     </form>
 </div>
 {% endblock %}

@@ -21,21 +21,20 @@ def alipay_apply(request):
 @login_required(login_url="/login/")
 def alipay_submit(request):
     userLoginSuccess = request.user.is_authenticated()
-    # duser = DUser.objects.get(user=request.user)
-    # user = duser.user
-    user  = request.user
+    user = request.user
     print (user.email)
-    # pageName = "homepage"
     proxyaccount = ProxyAccount.objects.get(user=request.user)
-    money = request.POST['money']
-    # try:
-    if True:
-        pay = Pay(out_trade_no = uuid.uuid1().hex,user=user,total_fee = money,status = 'U')
+    m = request.POST['money']
+    money = float(m)/100
+    pay_type = request.POST['type']
+    month = request.POST['month']
+    try:
+        pay = Pay(out_trade_no=uuid.uuid1().hex, user=user, total_fee=money, type=int(pay_type), month=int(month), status='U')
         pay.save()
         params = {
             'out_trade_no':pay.out_trade_no,
             'subject':u'清云加速',
-            'body':u'代理包月费',
+            'body':u'流量购买费用',
             'total_fee':str(money)}
         total_fee = pay.total_fee
         alipay = Alipay(notifyurl="http://www.thucloud.com/alipay/callback",
@@ -44,38 +43,39 @@ def alipay_submit(request):
         params.update(alipay.conf)
         sign = alipay.buildSign(params)
         return render_to_response('alipay_order.html',locals())
-    # except:
-    #     return HttpResponse('生成帐单错误')
+    except:
+        return HttpResponse('生成帐单错误')
+
     return render_to_response('alipay_submit.html', locals(), context_instance=RequestContext(request))
 
 @csrf_exempt
 def alipay_callback(request):
     params = request.POST.dict()
-    print ("call back params")
-    print (params)
+    print("call back params")
+    print(params)
     alipay = Alipay()
-    sign=None
+    sign = None
     if 'sign' in params:
-        sign=params['sign']
-    locSign=alipay.buildSign(params)
+        sign = params['sign']
+    locSign = alipay.buildSign(params)
 
-    if sign==None or locSign!=sign:
+    if sign is None or locSign != sign:
         return HttpResponse("fail")
 
     print ("sign is ok")
     if params['trade_status']!='TRADE_FINISHED' and  params['trade_status']!='TRADE_SUCCESS':
         return HttpResponse("fail")
     else:
-        print ("trade status ok")
-        print ("Verify the request is call by alipay.com....")
+        print("trade status ok")
+        print("Verify the request is call by alipay.com....")
         url = verifyURL['https'] + "&partner=%s&notify_id=%s"%(alipay.conf['partner'],params['notify_id'])
-        print (url)
-        response=urllib.request.urlopen(url)
-        html=response.read()
+        print(url)
+        response = urllib.request.urlopen(url)
+        html = response.read()
 
-        print ("aliypay.com return: %s" % html)
-        if html== b'true':
-            print ('result is true')
+        print("aliypay.com return: %s" % html)
+        if html == b'true':
+            print('result is true')
             #try:
             if True:
                 out_trade_no = params['out_trade_no']
@@ -120,7 +120,7 @@ def alipay_callback(request):
                     print (expired_date.strftime('%Y-%m-%d %H:%M:%S'))
                     proxyaccount.paydate = today
                     proxyaccount.expired_date = expired_date
-                print (proxyaccount)
+                print(proxyaccount)
                 proxyaccount.save()
             #except:
                 #pass

@@ -20,5 +20,7 @@ class Pay(models.Model):
     user = models.ForeignKey(User)
     status = models.CharField(max_length=2)
     total_fee = models.FloatField()
+    type = models.IntegerField()
+    month = models.IntegerField()
     buy_id = models.CharField(max_length=255)
     buy_email = models.CharField(max_length=255)
