@@ -28,6 +28,7 @@ def guide(request):
     pageName = "guide"
     return render_to_response('guide.html', locals(), context_instance=RequestContext(request))
 
+
 def accoutTypes(request):
     userLoginSuccess = request.user.is_authenticated()
     user = request.user

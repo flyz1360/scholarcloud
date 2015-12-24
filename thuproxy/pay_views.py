@@ -20,6 +20,15 @@ def alipay_apply(request):
     return render_to_response('alipay_apply.html', locals(), context_instance=RequestContext(request))
 
 @login_required(login_url="/login/")
+def alipay_apply_temp(request):
+    userLoginSuccess = request.user.is_authenticated()
+    # duser = DUser.objects.get(user=request.user)
+    # pageName = "homepage"
+    proxyaccount = ProxyAccount.objects.get(user=request.user)
+
+    return render_to_response('alipay_apply_temp.html', locals(), context_instance=RequestContext(request))
+
+@login_required(login_url="/login/")
 def alipay_submit(request):
     userLoginSuccess = request.user.is_authenticated()
     user = request.user
@@ -30,7 +39,7 @@ def alipay_submit(request):
     pay_type = request.POST['type']
     month = request.POST['month']
     try:
-        pay = Pay(out_trade_no=uuid.uuid1().hex, user=user, total_fee=money, type=int(pay_type), month=int(month), status='U')
+        pay = Pay(out_trade_no=uuid.uuid1().hex, user=user, total_fee=money, type=int(pay_type), month=int(month), status='waiting')
         pay.save()
         params = {
             'out_trade_no':pay.out_trade_no,
@@ -48,6 +57,7 @@ def alipay_submit(request):
         return HttpResponse('生成帐单错误')
 
     return render_to_response('alipay_submit.html', locals(), context_instance=RequestContext(request))
+
 
 @csrf_exempt
 def alipay_callback(request):
@@ -84,9 +94,10 @@ def alipay_callback(request):
                 buyer_email = params['buyer_email']
                 total_fee = params['total_fee']
                 pay = Pay.objects.get(out_trade_no = out_trade_no)
-                if pay.status == 'S':
+                # todo all of return httpResponse
+                if pay.status == 'success':
                     return HttpResponse("success")
-                pay.status = 'S'
+                pay.status = 'success'
                 pay.trade_no = trade_no
                 pay.buyer_id = buyer_id
                 pay.buyer_email = buyer_email
@@ -171,3 +182,15 @@ def inputDcode(request):
                 return render_to_response('dcode.html', locals(), context_instance=RequestContext(request))
     return HttpResponseRedirect('/dcode')
 
+
+@login_required(login_url="/login/")
+def alipay_cancel(request, pay_no):
+    pay = Pay.objects.get(out_trade_no=pay_no)
+    if pay is None:
+        error = {'pay': 'cancel'}
+        # todo 改成订单查看页面
+        return render_to_response('/homepage', locals(), context_instance=RequestContext(request))
+    else:
+        pay.status = 'canceled'
+        pay.save()
+        return render_to_response('/homepage', locals(), context_instance=RequestContext(request))
