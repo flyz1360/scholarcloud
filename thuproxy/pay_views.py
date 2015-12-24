@@ -118,9 +118,10 @@ def alipay_callback(request):
                 print (type(pay_type))
                 if pay_type == 1:
                     # todo
-                    if total_fee == 0.10:
-                        real_fee = total_fee * 10
-                    real_fee = total_fee
+                    if float(total_fee) == 0.10:
+                        real_fee = float(total_fee) * 10
+                    else:
+                        real_fee = total_fee
                     print ('realfee',real_fee)
                     account_type = int(real_fee)/int(month)
                     print("accounttype", account_type)
