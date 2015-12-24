@@ -2,8 +2,8 @@
 
 {% block content %}
     {% if proxyaccount.remainTime == None %}
-        <p align="center">您尚未缴费，请点击<a href="/alipay/apply" >缴费</a><a href="/alipay/temp-apply" >内测缴费</a></p>
-        <p align="center">或者<a href="/dcode/" >输入注册码</a></p>
+        <p align="center">您尚未缴费，请点击<a href="/alipay/apply" >缴费</a></p>
+        <p align="center">或者<a href="/alipay/temp-apply" >内测缴费</a></p>
     {% else %}
         {% if proxyaccount.type == 7 %}
             <p align="center">您的账户为：<a href="/accoutTypes/" title="查看资费说明">体验用户</a></p>
