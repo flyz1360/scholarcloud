@@ -20,15 +20,27 @@ def alipay_apply(request):
     return render_to_response('alipay_apply.html', locals(), context_instance=RequestContext(request))
 
 @login_required(login_url="/login/")
+def alipay_apply_temp(request):
+    userLoginSuccess = request.user.is_authenticated()
+    # duser = DUser.objects.get(user=request.user)
+    # pageName = "homepage"
+    proxyaccount = ProxyAccount.objects.get(user=request.user)
+
+    return render_to_response('alipay_apply_temp.html', locals(), context_instance=RequestContext(request))
+
+@login_required(login_url="/login/")
 def alipay_submit(request):
     userLoginSuccess = request.user.is_authenticated()
     user = request.user
-    print (user.email)
+    print(user.email)
     proxyaccount = ProxyAccount.objects.get(user=request.user)
-    m = request.POST['money']
-    money = float(m)/100
+    # todo
+    # m = request.POST['money']
+    # money = float(m)/100
+    money = request.POST['money']
     pay_type = request.POST['type']
     month = request.POST['month']
+    print(money, pay_type)
     try:
         pay = Pay(out_trade_no=uuid.uuid1().hex, user=user, total_fee=money, type=int(pay_type), month=int(month), status='U')
         pay.save()
@@ -44,10 +56,12 @@ def alipay_submit(request):
         params.update(alipay.conf)
         sign = alipay.buildSign(params)
         return render_to_response('alipay_order.html',locals())
-    except:
+    except Exception as e:
+        print(e)
         return HttpResponse('生成帐单错误')
 
     return render_to_response('alipay_submit.html', locals(), context_instance=RequestContext(request))
+
 
 @csrf_exempt
 def alipay_callback(request):
@@ -84,8 +98,9 @@ def alipay_callback(request):
                 buyer_email = params['buyer_email']
                 total_fee = params['total_fee']
                 pay = Pay.objects.get(out_trade_no = out_trade_no)
+                # todo all of return httpResponse
                 if pay.status == 'S':
-                    return HttpResponse("success")
+                    return HttpResponse("S")
                 pay.status = 'S'
                 pay.trade_no = trade_no
                 pay.buyer_id = buyer_id
@@ -102,7 +117,10 @@ def alipay_callback(request):
                 print ('month',month)
                 print (type(pay_type))
                 if pay_type == 1:
-                    real_fee = float(total_fee)*100
+                    # todo
+                    if total_fee == 0.1:
+                        real_fee = total_fee * 10
+                    real_fee = total_fee
                     print ('realfee',real_fee)
                     account_type = int(real_fee)/int(month)
                     print("accounttype", account_type)
@@ -173,3 +191,15 @@ def inputDcode(request):
                 return render_to_response('dcode.html', locals(), context_instance=RequestContext(request))
     return HttpResponseRedirect('/dcode')
 
+
+@login_required(login_url="/login/")
+def alipay_cancel(request, pay_no):
+    pay = Pay.objects.get(out_trade_no=pay_no)
+    if pay is None:
+        error = {'pay': 'cancel'}
+        # todo 改成订单查看页面
+        return render_to_response('/homepage', locals(), context_instance=RequestContext(request))
+    else:
+        pay.status = 'C'
+        pay.save()
+        return render_to_response('/homepage', locals(), context_instance=RequestContext(request))

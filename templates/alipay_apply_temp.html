@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+    {% block custom_js %}
+        <script type="text/javascript" src="/static/js/pay.js"></script>
+    {% endblock %}
+
+{% block content %}
+<div class="form-horizontal">
+    <form method = "post" action="/alipay/submit">
+        {% csrf_token %}
+        <div class="form-group">
+            <lable class="col-xs-10 col-xs-offset-2 col-sm-3 col-md-2 control-label" >共需支付：</lable>
+            <div class="col-xs-4 col-xs-offset-2  col-sm-3 col-md-2 col-sm-offset-0">
+                <input class="form-control" id="money" type="text" name="money" value="0.1" readonly>
+            </div>
+            <lable class="control-label" style="text-align: left;padding-left: 15px;">元</lable>
+            <button class="btn btn-success" style="width: 80px; margin-left: 20px" type="submit">购买</button>
+        </div>
+        <input type="hidden" name="type" value="1">
+        <input type="hidden" id="month" name="month" value="1">
+    </form>
+</div>
+{% endblock %}
