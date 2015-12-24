@@ -32,14 +32,17 @@ def alipay_apply_temp(request):
 def alipay_submit(request):
     userLoginSuccess = request.user.is_authenticated()
     user = request.user
-    print (user.email)
+    print(user.email)
     proxyaccount = ProxyAccount.objects.get(user=request.user)
-    m = request.POST['money']
-    money = float(m)/100
+    # todo
+    # m = request.POST['money']
+    # money = float(m)/100
+    money = request.POST['money']
     pay_type = request.POST['type']
     month = request.POST['month']
+    print(money, pay_type)
     try:
-        pay = Pay(out_trade_no=uuid.uuid1().hex, user=user, total_fee=money, type=int(pay_type), month=int(month), status='waiting')
+        pay = Pay(out_trade_no=uuid.uuid1().hex, user=user, total_fee=money, type=int(pay_type), month=int(month), status='U')
         pay.save()
         params = {
             'out_trade_no':pay.out_trade_no,
@@ -53,7 +56,8 @@ def alipay_submit(request):
         params.update(alipay.conf)
         sign = alipay.buildSign(params)
         return render_to_response('alipay_order.html',locals())
-    except:
+    except Exception as e:
+        print(e)
         return HttpResponse('生成帐单错误')
 
     return render_to_response('alipay_submit.html', locals(), context_instance=RequestContext(request))
@@ -95,9 +99,9 @@ def alipay_callback(request):
                 total_fee = params['total_fee']
                 pay = Pay.objects.get(out_trade_no = out_trade_no)
                 # todo all of return httpResponse
-                if pay.status == 'success':
-                    return HttpResponse("success")
-                pay.status = 'success'
+                if pay.status == 'S':
+                    return HttpResponse("S")
+                pay.status = 'S'
                 pay.trade_no = trade_no
                 pay.buyer_id = buyer_id
                 pay.buyer_email = buyer_email
@@ -113,7 +117,10 @@ def alipay_callback(request):
                 print ('month',month)
                 print (type(pay_type))
                 if pay_type == 1:
-                    real_fee = float(total_fee)*100
+                    # todo
+                    if total_fee == 0.1:
+                        real_fee = total_fee * 10
+                    real_fee = total_fee
                     print ('realfee',real_fee)
                     account_type = int(real_fee)/int(month)
                     print("accounttype", account_type)
@@ -191,6 +198,6 @@ def alipay_cancel(request, pay_no):
         # todo 改成订单查看页面
         return render_to_response('/homepage', locals(), context_instance=RequestContext(request))
     else:
-        pay.status = 'canceled'
+        pay.status = 'C'
         pay.save()
         return render_to_response('/homepage', locals(), context_instance=RequestContext(request))
