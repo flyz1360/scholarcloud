@@ -13,6 +13,7 @@ def create_pac(proxyaccount):
     template_pac = open("./static/myproxy.pac", "r+")
     d = template_pac.read()
     pac_no = uuid.uuid1()
+    print ("pac_no", pac_no)
     proxyaccount.pac_no = pac_no;
     proxyaccount.save()
     d = d.replace("4128", str(proxyaccount.port))
@@ -22,12 +23,18 @@ def create_pac(proxyaccount):
 
 
 def open_listen_port(port_num):
-    address = ('166.111.80.96', 4127)
-    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    sock.connect(address)
-    data = 'addport@'+str(port_num)+'\n'
-    sock.send(data.encode())
-    sock.close()
+    try:
+        address = ('166.111.80.96', 4127)
+        print ("connecting")
+        socket.setdefaulttimeout(30)
+        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        sock.connect(address)
+        data = 'addport@'+str(port_num)+'\n'
+        sock.send(data.encode())
+        sock.close()
+    except socket.error as e:
+        print(e)
+    print ("connected")
 
 
 def get_port_num():

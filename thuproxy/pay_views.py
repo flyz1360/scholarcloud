@@ -139,7 +139,9 @@ def alipay_callback(request):
                         if proxyaccount.paydate is None:
                             print("init paydate")
                             create_pac(proxyaccount)
+                            print ("create_pac done")
                             open_listen_port(proxyaccount.port)
+                            print ("open_listen_port done")
                             proxyaccount.paydate = today
                         proxyaccount.expired_date = expired_date
                 else:
