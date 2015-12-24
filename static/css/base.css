@@ -25,6 +25,10 @@ label.error {
   width: auto;
 }
 
+.panel-body > img {
+  margin-bottom: 20px;
+}
+
 /*-------------- navbar-------------*/
 .navbar {
   text-align: center;
