@@ -1,8 +1,8 @@
 ﻿﻿{% extends "base.html" %}
 
 {% block content %}
-    {% if proxyaccount.remainTime == None %}
-        <p align="center">您尚未缴费，请点击<a href="/alipay/apply" >缴费</a></p>
+    {% if proxyaccount.remain_time == None %}
+        <p align="center">您尚未缴费，请点击<a href="/alipay/apply/first" >缴费</a></p>
         <p align="center">或者<a href="/alipay/temp-apply" >内测缴费</a></p>
     {% else %}
         {% if proxyaccount.type == 7 %}
@@ -10,8 +10,8 @@
         {% elif proxyaccount.type == 8  %}
             <p align="center">您的账户为：<a href="/accoutTypes/" title="查看资费说明">VIP用户</a></p>
         {% endif %}
-        <p align="center">您的{{ proxyaccount.type }}元套餐剩余时间还有{{ proxyaccount.remainTime }} <!-- <a href="/alipay/apply">续费</a></p>-->
-        <p align="center">自动配置URL：<label>http://pac.scholar.thucloud.com/{{ proxyaccount.pac_no }}.pac</label><!--<input type="text" disabled="true " value="http://www.thucloud.com/static/myproxy.pac"> <input type="button" value="点击复制">--></p>
+        <p align="center">您的{{ proxyaccount.type }}元套餐剩余时间还有{{ proxyaccount.remain_time }}天<a href="/alipay/apply/continue">续费</a><a href="/alipay/apply/upgrade">升级</a></p>
+        <p align="center">自动配置URL：<label>http://pac.scholar.thucloud.com/{{ proxyaccount.pac_no }}.pac</label></p>
        <p align="center">详情请查看<a href="/guide">配置说明</a></p>
     {% endif %}
 {% endblock %}

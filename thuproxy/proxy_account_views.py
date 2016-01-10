@@ -16,10 +16,10 @@ def create_pac(proxyaccount):
     print ("pac_no", pac_no)
     proxyaccount.pac_no = pac_no;
     proxyaccount.save()
-    d = d.replace("4128", str(proxyaccount.port))
-    user_pac = open('/data/pac/'+str(pac_no)+'.pac', 'w+')
-    user_pac.write(d)
-    user_pac.close()
+    # d = d.replace("4128", str(proxyaccount.port))
+    # user_pac = open('/data/pac/'+str(pac_no)+'.pac', 'w+')
+    # user_pac.write(d)
+    # user_pac.close()
 
 
 def open_listen_port(port_num):
@@ -55,12 +55,11 @@ def homepage(request):
 
     if proxyaccount.expired_date is not None:
         if datetime.datetime.now().date() <= proxyaccount.expired_date:
-            print('ok')
-            proxyaccount.remainTime = proxyaccount.expired_date - datetime.datetime.now().date()
-            proxyaccount.remainTime = str(proxyaccount.remainTime).replace('days, 0:00:00','天')
+            remain_time = proxyaccount.expired_date - datetime.datetime.now().date()
+            proxyaccount.remain_time = int(remain_time.days)
         else:
-            proxyaccount.remainTime = None
+            proxyaccount.remain_time = None
     else:
-        proxyaccount.remainTime = None
+        proxyaccount.remain_time = None
     return render_to_response('homepage.html', locals(), context_instance=RequestContext(request))
 

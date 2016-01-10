@@ -11,44 +11,46 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render_to_response, RequestContext
 
 @login_required(login_url="/login/")
-def alipay_apply(request):
+def alipay_apply(request, pay_type):
     userLoginSuccess = request.user.is_authenticated()
-    # duser = DUser.objects.get(user=request.user)
-    # pageName = "homepage"
     proxyaccount = ProxyAccount.objects.get(user=request.user)
+    if pay_type == 'first':
+        return render_to_response('alipay_create_order_first.html', locals(), context_instance=RequestContext(request))
+    elif pay_type == 'upgrade':
+        if datetime.datetime.now().date() <= proxyaccount.expired_date:
+            remain_time = proxyaccount.expired_date - datetime.datetime.now().date()
+            proxyaccount.remain_time = int(remain_time.days)
+        return render_to_response('alipay_create_order_upgrade.html', locals(), context_instance=RequestContext(request))
+    elif pay_type == 'continue':
+        return render_to_response('alipay_create_order_continue.html', locals(), context_instance=RequestContext(request))
+    else:
+        return HttpResponse('充值请求错误')
 
-    return render_to_response('alipay_apply.html', locals(), context_instance=RequestContext(request))
 
 @login_required(login_url="/login/")
 def alipay_apply_temp(request):
     userLoginSuccess = request.user.is_authenticated()
-    # duser = DUser.objects.get(user=request.user)
-    # pageName = "homepage"
     proxyaccount = ProxyAccount.objects.get(user=request.user)
+    return render_to_response('alipay_create_order_temp.html', locals(), context_instance=RequestContext(request))
 
-    return render_to_response('alipay_apply_temp.html', locals(), context_instance=RequestContext(request))
 
 @login_required(login_url="/login/")
 def alipay_submit(request):
     userLoginSuccess = request.user.is_authenticated()
     user = request.user
-    print(user.email)
     proxyaccount = ProxyAccount.objects.get(user=request.user)
     # todo
-    # m = request.POST['money']
-    # money = float(m)/100
+    m = request.POST['money']
+    money = float(m)/100
     money = request.POST['money']
-    pay_type = request.POST['type']
+    pay_type = request.POST['pay_type']
     month = request.POST['month']
+    today = datetime.datetime.now()
     print(money, pay_type)
     try:
-        pay = Pay(out_trade_no=uuid.uuid1().hex, user=user, total_fee=money, type=int(pay_type), month=int(month), status='U')
+        pay = Pay(out_trade_no=uuid.uuid1().hex, user=user, total_fee=money, type=int(pay_type), month=int(month), status='U', create_date=today)
         pay.save()
-        params = {
-            'out_trade_no':pay.out_trade_no,
-            'subject':u'清云加速',
-            'body':u'流量购买费用',
-            'total_fee':str(money)}
+        params = {'out_trade_no':pay.out_trade_no, 'subject':u'清云加速', 'body':u'流量购买费用', 'total_fee':str(money)}
         total_fee = pay.total_fee
         alipay = Alipay(notifyurl="http://scholar.thucloud.com/alipay/callback",
                  returnurl="http://scholar.thucloud.com/alipay/success",
@@ -91,22 +93,16 @@ def alipay_callback(request):
         print("aliypay.com return: %s" % html)
         if html == b'true':
             print('result is true')
+             # todo change iftrue to try
             if True:
                 out_trade_no = params['out_trade_no']
                 trade_no = params['trade_no']
-                buyer_id = params['buyer_id']
-                buyer_email = params['buyer_email']
                 total_fee = params['total_fee']
                 pay = Pay.objects.get(out_trade_no = out_trade_no)
                 # todo all of return httpResponse
                 if pay.status == 'S':
                     return HttpResponse("S")
-                pay.status = 'S'
-                pay.trade_no = trade_no
-                pay.buyer_id = buyer_id
-                pay.buyer_email = buyer_email
-                pay.total_fee = float(total_fee)
-                pay.save()
+
                 print ('payuser',pay.user)
                 proxyaccount = ProxyAccount.objects.get(user=pay.user)
                 print ('proxyaccount',proxyaccount)
@@ -115,25 +111,25 @@ def alipay_callback(request):
                 pay_type = pay.type
                 print ('paytype', pay_type)
                 print ('month',month)
-                print (type(pay_type))
+                # todo
+                if float(total_fee) == 0.10:
+                    real_fee = float(total_fee) * 10
+                else:
+                    real_fee = float(total_fee*100)
+                print ('realfee',real_fee)
+
                 if pay_type == 1:
-                    # todo
-                    if float(total_fee) == 0.10:
-                        real_fee = float(total_fee) * 10
-                    else:
-                        real_fee = total_fee
-                    print ('realfee',real_fee)
                     account_type = int(real_fee)/int(month)
                     print("accounttype", account_type)
                     if account_type not in {1,5,10,20,50}:
-                        return HttpResponse("fail")
+                        return HttpResponse("accout_type_error")
                     else:
                         print("success:",account_type," month",month)
                         proxyaccount.type = account_type
                         today = datetime.datetime.now()
                         if proxyaccount.expired_date is not None:
                             print("add month")
-                            expired_date = proxyaccount.expired_date + datetime.timedelta(30*int(month))
+                            return HttpResponse("not init")
                         else:
                             print("init month")
                             expired_date = today + datetime.timedelta(30*int(month))
@@ -145,24 +141,49 @@ def alipay_callback(request):
                             print ("open_listen_port done")
                             proxyaccount.paydate = today
                         proxyaccount.expired_date = expired_date
+                elif pay_type == 2:
+                    account_type = int(real_fee)/int(month)
+                    print("accounttype", account_type)
+                    if account_type != proxyaccount.type or proxyaccount.expired_date is None:
+                        return HttpResponse("accout_type_error")
+                    else:
+                        print("success:",account_type," month",month)
+                        today = datetime.date.today()
+                        print("add month")
+                        if proxyaccount.expired_date < today:
+                            expired_date = today + datetime.timedelta(30*int(month))
+                        else:
+                            expired_date = proxyaccount.expired_date + datetime.timedelta(30*int(month))
+                        proxyaccount.expired_date = expired_date
+                elif pay_type == 3:
+                    upgrade_delta = (real_fee/month)*30
+                    upgrade_delta = int(upgrade_delta+0.1)
+                    print(upgrade_delta)
+                    proxyaccount.type += upgrade_delta
+                    if proxyaccount.type not in {1,5,10,20,50}:
+                        return HttpResponse("accout_type_error")
                 else:
+                    pay.status = 'F'
+                    pay.save()
                     return HttpResponse("fail")
 
+                print("sava pay")
+                pay.status = 'S'
+                pay.trade_no = trade_no
+                pay.total_fee = real_fee
+                pay.save()
                 print("sava proxyaccount")
                 proxyaccount.save()
             return HttpResponse("success")
-
         return HttpResponse("fail")
 
 
 @login_required(login_url="/login/")
 def alipay_success(request):
     userLoginSuccess = request.user.is_authenticated()
-    # duser = DUser.objects.get(user=request.user)
     # pageName = "homepage"
     proxyaccount = ProxyAccount.objects.get(user=request.user)
     return render_to_response('alipay_success.html', locals(), context_instance=RequestContext(request))
-
 
 
 @login_required(login_url="/login/")
@@ -199,8 +220,8 @@ def alipay_cancel(request, pay_no):
     if pay is None:
         error = {'pay': 'cancel'}
         # todo 改成订单查看页面
-        return render_to_response('/homepage', locals(), context_instance=RequestContext(request))
+        #return render_to_response('/homepage', locals(), context_instance=RequestContext(request))
     else:
         pay.status = 'C'
         pay.save()
-        return render_to_response('/homepage', locals(), context_instance=RequestContext(request))
+        return HttpResponseRedirect('/homepage')
