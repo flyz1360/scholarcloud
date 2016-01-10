@@ -114,7 +114,7 @@ def alipay_callback(request):
                 if float(total_fee) == 0.10:
                     real_fee = float(total_fee) * 10
                 else:
-                    real_fee = float(total_fee*100)
+                    real_fee = float(total_fee)*100
                 print ('realfee',real_fee)
 
                 if pay_type == 1:
