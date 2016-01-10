@@ -42,7 +42,6 @@ def alipay_submit(request):
     # todo
     m = request.POST['money']
     money = float(m)/100
-    money = request.POST['money']
     pay_type = request.POST['pay_type']
     month = request.POST['month']
     today = datetime.datetime.now()
