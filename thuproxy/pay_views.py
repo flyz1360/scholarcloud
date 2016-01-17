@@ -13,10 +13,21 @@ from django.shortcuts import render_to_response, RequestContext
 @login_required(login_url="/login/")
 def alipay_apply(request, pay_type):
     userLoginSuccess = request.user.is_authenticated()
+    user = request.user
     proxyaccount = ProxyAccount.objects.get(user=request.user)
+    pay_list = Pay.objects.filter(user_id=user.id,status='U')
+    if len(pay_list) != 0:
+        request.session["error"] = "need_repay"
+        return HttpResponseRedirect('/homepage')
     if pay_type == 'first':
+        if proxyaccount.expired_date != None:
+            request.session["error"] = "first_pay"
+            return HttpResponseRedirect('/homepage')
         return render_to_response('alipay_create_order_first.html', locals(), context_instance=RequestContext(request))
     elif pay_type == 'upgrade':
+        if proxyaccount.type == 50:
+            request.session["error"] = "upgrade"
+            return HttpResponseRedirect('/homepage')
         if datetime.datetime.now().date() <= proxyaccount.expired_date:
             remain_time = proxyaccount.expired_date - datetime.datetime.now().date()
             proxyaccount.remain_time = int(remain_time.days)
@@ -35,7 +46,7 @@ def alipay_apply_temp(request):
 
 
 @login_required(login_url="/login/")
-def alipay_submit(request):
+def alipay_create_orders(request):
     userLoginSuccess = request.user.is_authenticated()
     user = request.user
     proxyaccount = ProxyAccount.objects.get(user=request.user)
@@ -59,9 +70,33 @@ def alipay_submit(request):
         return render_to_response('alipay_order.html',locals())
     except Exception as e:
         print(e)
-        return HttpResponse('生成帐单错误')
+        return HttpResponse('生成订单错误')
 
-    return render_to_response('alipay_submit.html', locals(), context_instance=RequestContext(request))
+
+@login_required(login_url="/login/")
+def alipay_repay_orders(request, pay_no):
+    userLoginSuccess = request.user.is_authenticated()
+    user = request.user
+    proxyaccount = ProxyAccount.objects.get(user=request.user)
+    try:
+        pay_list = Pay.objects.filter(out_trade_no=pay_no)
+        if len(pay_list) != 1:
+            request.session["error"] = "repay"
+            return HttpResponseRedirect('/homepage')
+        else:
+            pay = pay_list[0]
+            params = {'out_trade_no':pay.out_trade_no, 'subject':u'清云加速', 'body':u'流量购买费用', 'total_fee':str(pay.total_fee)}
+            total_fee = pay.total_fee
+            alipay = Alipay(notifyurl="http://scholar.thucloud.com/alipay/callback",
+                     returnurl="http://scholar.thucloud.com/alipay/success",
+                     showurl="http://scholar.thucloud.com/alipay/success")
+            params.update(alipay.conf)
+            sign = alipay.buildSign(params)
+            money = pay.total_fee
+            return render_to_response('alipay_order.html',locals())
+    except Exception as e:
+        print(e)
+        return HttpResponse('显示订单错误')
 
 
 @csrf_exempt
@@ -215,12 +250,75 @@ def inputDcode(request):
 
 @login_required(login_url="/login/")
 def alipay_cancel(request, pay_no):
-    pay = Pay.objects.get(out_trade_no=pay_no)
-    if pay is None:
-        error = {'pay': 'cancel'}
-        # todo 改成订单查看页面
-        #return render_to_response('/homepage', locals(), context_instance=RequestContext(request))
-    else:
-        pay.status = 'C'
-        pay.save()
+    print(pay_no)
+    pay = Pay.objects.filter(out_trade_no=pay_no)
+    if len(pay) != 1:
+        request.session["error"] = "cancel"
         return HttpResponseRedirect('/homepage')
+    else:
+        pay[0].status = 'C'
+        pay[0].save()
+        return HttpResponseRedirect('/homepage')
+
+
+def alipay_test(request):
+    pay_type = int(request.POST['pay_type'])
+    month = int(request.POST['month'])
+    total_fee = float(request.POST['money'])
+    total_fee /= 100
+    proxyaccount = ProxyAccount.objects.get(user=request.user)
+    if float(total_fee) == 0.10:
+        real_fee = float(total_fee) * 10
+    else:
+        real_fee = float(total_fee*100)
+    print ('realfee',real_fee)
+
+    if pay_type == 1:
+        account_type = int(real_fee)/int(month)
+        print("accounttype", account_type)
+        if account_type not in {1,5,10,20,50}:
+            return HttpResponse("accout_type_error")
+        else:
+            print("success:",account_type," month",month)
+            proxyaccount.type = account_type
+            today = datetime.datetime.now()
+            if proxyaccount.expired_date is not None:
+                print("add month")
+                return HttpResponse("not init")
+            else:
+                print("init month")
+                expired_date = today + datetime.timedelta(30*int(month))
+            if proxyaccount.paydate is None:
+                print("init paydate")
+                create_pac(proxyaccount)
+                print ("create_pac done")
+                open_listen_port(proxyaccount.port)
+                print ("open_listen_port done")
+                proxyaccount.paydate = today
+            proxyaccount.expired_date = expired_date
+    elif pay_type == 2:
+        account_type = int(real_fee)/int(month)
+        print("accounttype", account_type)
+        if account_type != proxyaccount.type or proxyaccount.expired_date is None:
+            return HttpResponse("accout_type_error")
+        else:
+            print("success:",account_type," month",month)
+            today = datetime.date.today()
+            print("add month")
+            if proxyaccount.expired_date < today:
+                expired_date = today + datetime.timedelta(30*int(month))
+            else:
+                expired_date = proxyaccount.expired_date + datetime.timedelta(30*int(month))
+            proxyaccount.expired_date = expired_date
+    elif pay_type == 3:
+        upgrade_delta = (real_fee/month)*30
+        upgrade_delta = int(upgrade_delta+0.1)
+        print(upgrade_delta)
+        proxyaccount.type += upgrade_delta
+        if proxyaccount.type not in {1,5,10,20,50}:
+            return HttpResponse("accout_type_error")
+    else:
+        return HttpResponse("fail")
+    print("sava proxyaccount")
+    proxyaccount.save()
+    return HttpResponseRedirect('/homepage')

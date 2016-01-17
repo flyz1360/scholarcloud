@@ -12,7 +12,7 @@
                     <tr><td>用户帐号</td><td>{{ user.username }}</td></tr>
                     <tr><td>用户邮箱</td><td>{{ user.email }}</td></tr>
                     <tr><td>帐单号</td><td>{{ params.out_trade_no }}</td></tr>
-                    <tr><td>充值金额</td><td>{{ money }}</td></tr>
+                    <tr><td>充值金额</td><td>{{ money }}元</td></tr>
                       <tr><td></td><td>
                     <form name='alipaysubmit' action='https://www.alipay.com/cooperate/gateway.do?_input_charset=UTF-8' method='POST'>
                     <input type='hidden' name='body' value='{{ params.body }}' />

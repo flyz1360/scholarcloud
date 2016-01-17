@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+
+
+{% block content %}
+<div style="width: 800px; margin-left: auto;margin-right: auto">
+    <table class="table table-bordered table-striped">
+        <thead>
+            <tr ><th>订单金额</th><th>订单类型</th><th>订单时间</th><th>订单状态</th></tr>
+        </thead>
+        <tbody>
+        {% for pay in pay_list %}
+            <tr>
+                <td>{{ pay.total_fee }}元</td>
+                <td>
+                    {% if pay.type == 1 %}
+                    初次缴费
+                    {% elif pay.type == 2 %}
+                    续费
+                    {% elif pay.type == 3 %}
+                    升级
+                    {% endif %}
+                </td>
+                <td>{{ pay.create_date |date:'Y-m-d H:i:s' }}</td>
+                <td>
+                    {% if pay.status == 'U' %}
+                    <a href="/alipay/repay/{{ pay.out_trade_no }}">待支付 </a><a href="/alipay/cancel/{{ pay.out_trade_no }}">取消订单</a>
+                    {% elif pay.status == 'C' %}
+                    取消
+                    {% elif pay.status == 'S' %}
+                    支付完成
+                    {% endif %}
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

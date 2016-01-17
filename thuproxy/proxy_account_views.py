@@ -52,7 +52,9 @@ def homepage(request):
     user = request.user
     pageName = "homepage"
     proxyaccount = ProxyAccount.objects.get(user=request.user)
-
+    if "error" in request.session:
+        error = request.session['error']
+        del request.session['error']
     if proxyaccount.expired_date is not None:
         if datetime.datetime.now().date() <= proxyaccount.expired_date:
             remain_time = proxyaccount.expired_date - datetime.datetime.now().date()
@@ -62,4 +64,13 @@ def homepage(request):
     else:
         proxyaccount.remain_time = None
     return render_to_response('homepage.html', locals(), context_instance=RequestContext(request))
+
+
+@login_required(login_url="/login/")
+def show_orders(request):
+    userLoginSuccess = request.user.is_authenticated()
+    pageName = "homepage"
+    user = request.user
+    pay_list = Pay.objects.filter(user_id=user.id)
+    return render_to_response('show_orders.html', locals(), context_instance=RequestContext(request))
 

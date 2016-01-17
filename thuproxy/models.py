@@ -24,4 +24,4 @@ class Pay(models.Model):
     month = models.IntegerField()
     buy_id = models.CharField(max_length=255)
     buy_email = models.CharField(max_length=255)
-    create_date = models.DateField(blank=True, null=True)
+    create_date = models.DateTimeField(blank=True, null=True)
