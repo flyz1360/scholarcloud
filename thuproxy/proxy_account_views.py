@@ -38,7 +38,7 @@ def open_listen_port(port_num):
 
 
 def get_port_num():
-    random_data = range(4130, 47000)
+    random_data = range(10001, 47000)
     while True:
         port_num = random.sample(random_data, 1)
         if ProxyAccount.objects.filter(port=port_num[0]).count() == 0:

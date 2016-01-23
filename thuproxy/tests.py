@@ -1,88 +1,39 @@
 #coding=utf-8
+import pymysql
 import socket
-import os
+
 
 # try:
-#     address = ('166.111.80.96', 4127)
-#     socket.setdefaulttimeout(20)
-#     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-#     sock.connect(address)
-#     data = 'addport@'+'10003'+'\n'
-#     sock.send(data.encode())
-#     sock.close()
-# except socket.error as e:
+#     conn=pymysql.connect(host='58.205.208.71',user='root',passwd='thuproxy',port=8779,charset='utf8')
+#     cur=conn.cursor()                              #获取一个游标对象
+#     cur.execute("USE thuproxy")
+#     cur.execute("SELECT * FROM thuproxy_proxyaccount")
+#     data=cur.fetchall()
+#
+#     for row in data:
+#         print(row[5])
+#         print(type(row[4]))
+#         try:
+#             address = ('166.111.80.96', 4127)
+#             socket.setdefaulttimeout(20)
+#             sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+#             sock.connect(address)
+#             data = 'addport@'+str(row[5])+'\n'
+#             sock.send(data.encode())
+#             sock.close()
+#         except socket.error as e:
+#             print(e)
+#     cur.close()                                    #关闭游标
+#     conn.commit()                                  #向数据库中提交任何未解决的事务，对不支持事务的数据库不进行任何操作
+#     conn.close()                                   #关闭到数据库的连接，释放数据库资源
+#
+# except  Exception as e:
 #     print(e)
 
-pac_file_folder = './test/'
-files = os.listdir(pac_file_folder)
-for fs in files:
-    f = open(pac_file_folder+fs, "r+")
-    d = f.read()
-    d = d.replace('"1-apple.com.tw"', '"1-apple.com.tw","tcfbank.com"')
-    f.close()
-    w = open(pac_file_folder+fs, 'w+')
-    w.write(d)
-    w.close()
-
-# def alipay_test(request):
-#     pay_type = int(request.POST['pay_type'])
-#     month = int(request.POST['month'])
-#     total_fee = float(request.POST['money'])
-#     total_fee /= 100
-#     proxyaccount = ProxyAccount.objects.get(user=request.user)
-#     if float(total_fee) == 0.10:
-#         real_fee = float(total_fee) * 10
-#     else:
-#         real_fee = float(total_fee*100)
-#     print ('realfee',real_fee)
-#
-#     if pay_type == 1:
-#         account_type = int(real_fee)/int(month)
-#         print("accounttype", account_type)
-#         if account_type not in {1,5,10,20,50}:
-#             return HttpResponse("accout_type_error")
-#         else:
-#             print("success:",account_type," month",month)
-#             proxyaccount.type = account_type
-#             today = datetime.datetime.now()
-#             if proxyaccount.expired_date is not None:
-#                 print("add month")
-#                 return HttpResponse("not init")
-#             else:
-#                 print("init month")
-#                 expired_date = today + datetime.timedelta(30*int(month))
-#             if proxyaccount.paydate is None:
-#                 print("init paydate")
-#                 create_pac(proxyaccount)
-#                 print ("create_pac done")
-#                 open_listen_port(proxyaccount.port)
-#                 print ("open_listen_port done")
-#                 proxyaccount.paydate = today
-#             proxyaccount.expired_date = expired_date
-#     elif pay_type == 2:
-#         account_type = int(real_fee)/int(month)
-#         print("accounttype", account_type)
-#         if account_type != proxyaccount.type or proxyaccount.expired_date is None:
-#             return HttpResponse("accout_type_error")
-#         else:
-#             print("success:",account_type," month",month)
-#             today = datetime.date.today()
-#             print("add month")
-#             if proxyaccount.expired_date < today:
-#                 expired_date = today + datetime.timedelta(30*int(month))
-#             else:
-#                 expired_date = proxyaccount.expired_date + datetime.timedelta(30*int(month))
-#             proxyaccount.expired_date = expired_date
-#     elif pay_type == 3:
-#         upgrade_delta = (real_fee/month)*30
-#         upgrade_delta = int(upgrade_delta+0.1)
-#         print(upgrade_delta)
-#         proxyaccount.type += upgrade_delta
-#         if proxyaccount.type not in {1,5,10,20,50}:
-#             return HttpResponse("accout_type_error")
-#     else:
-#         return HttpResponse("fail")
-#     print("sava proxyaccount")
-#     proxyaccount.save()
-#     return HttpResponseRedirect('/homepage')
-
+address = ('166.111.80.96', 4126)
+socket.setdefaulttimeout(20)
+sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+sock.connect(address)
+data = 'addport@'+str(32112)+'\n'
+sock.send(data.encode())
+sock.close()

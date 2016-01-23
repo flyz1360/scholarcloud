@@ -16,7 +16,7 @@
                             window.location.href="/homepage";
                          }
                     }
-                    else if ('{{ error }}' == 'first'){
+                    else if ('{{ error }}' == 'first_pay'){
                         alert('您已经不是第一次付款')
                     }
                     else if ('{{ error }}' == 'upgrade'){
@@ -24,6 +24,9 @@
                     }
                     else if ('{{ error }}' == 'repay' || '{{ error }}' == 'cancel'){
                         alert('查无此订单')
+                    }
+                    else {
+                        alert('{{ error }}')
                     }
                 }
             })
@@ -33,7 +36,7 @@
 {% block content %}
     {% if proxyaccount.paydate == None %}
         <p align="center">您尚未缴费，请点击<a href="/alipay/apply/first" >缴费</a></p>
-        <p align="center">或者<a href="/alipay/temp-apply" >内测缴费</a></p>
+{#        <p align="center">或者<a href="/alipay/temp-apply" >内测缴费</a></p>#}
     {% else %}
         {% if proxyaccount.type == 7 %}
             <p align="center">您的账户为：<a href="/accoutTypes/" title="查看资费说明">体验用户</a></p>
@@ -46,6 +49,7 @@
             <p align="center">详情请查看<a href="/guide">配置说明</a></p>
         {% else%}
             <p align="center">您已欠费</p>
+            <p align="center">请点击<a href="/alipay/apply/continue">续费 </a></p>
         {% endif %}
     {% endif %}
 {% endblock %}
