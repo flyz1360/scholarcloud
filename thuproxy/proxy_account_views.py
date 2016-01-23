@@ -22,6 +22,20 @@ def create_pac(proxyaccount):
     user_pac.close()
 
 
+def regen_pac(request):
+    template_pac = open("./static/myproxy.pac", "r+")
+    d = template_pac.read()
+    account_list = ProxyAccount.objects.filter(pac_no__isnull=False)
+    print(len(account_list))
+    for account in account_list:
+        print ("pac_no", account.pac_no)
+        d = d.replace("4128", str(account.port))
+        user_pac = open('/data/pac/'+str(account.pac_no)+'.pac', 'w+')
+        user_pac.write(d)
+        user_pac.close()
+    return HttpResponse('success')
+
+
 def open_listen_port(port_num):
     try:
         address = ('166.111.80.96', 4127)
