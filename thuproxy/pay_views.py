@@ -162,20 +162,18 @@ def alipay_callback(request):
                         proxyaccount.type = account_type
                         today = datetime.datetime.now()
                         if proxyaccount.expired_date is not None:
-                            print("add month")
                             return HttpResponse("not init")
                         else:
-                            print("init month")
+                            print("init date")
                             expired_date = today + datetime.timedelta(30*int(month))
                         if proxyaccount.paydate is None:
-                            print("init paydate")
                             create_pac(proxyaccount)
-                            print ("create_pac done")
-                            open_listen_port(proxyaccount.port)
-                            print ("open_listen_port done")
+                            print("create_pac done")
+                            open_listen_port(proxyaccount.port, proxyaccount.type)
+                            print("open_listen_port done")
                             proxyaccount.paydate = today
                         proxyaccount.expired_date = expired_date
-                elif pay_type == 2:
+                elif pay_type == 2:  # 续费
                     account_type = int(real_fee)/int(month)
                     print("accounttype", account_type)
                     if account_type != proxyaccount.type or proxyaccount.expired_date is None:
@@ -184,8 +182,9 @@ def alipay_callback(request):
                         print("success:",account_type," month",month)
                         today = datetime.date.today()
                         print("add month")
-                        if proxyaccount.expired_date < today:
+                        if proxyaccount.expired_date < today:  #  欠费啦
                             expired_date = today + datetime.timedelta(30*int(month))
+                            reopen_port(proxyaccount.port)
                         else:
                             expired_date = proxyaccount.expired_date + datetime.timedelta(30*int(month))
                         proxyaccount.expired_date = expired_date
