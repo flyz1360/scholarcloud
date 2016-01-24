@@ -42,12 +42,11 @@ def create_pac(proxyaccount):
 
 
 def regen_pac():
-    template_pac = open("./static/myproxy.pac", "r+")
     account_list = ProxyAccount.objects.filter(pac_no__isnull=False)
     print(len(account_list))
     for account in account_list:
         print ("pac_no", account.pac_no)
-        d = template_pac.read()
+        d = open("./static/myproxy.pac", "r+").read()
         d = d.replace("4128", str(account.port))
         user_pac = open('/data/pac/'+str(account.pac_no)+'.pac', 'w+')
         user_pac.write(d)
