@@ -9,6 +9,25 @@ import  socket
 import random
 
 
+def script_lz(request, script_name):
+    if script_name == 'create_pac':
+        proxyaccount_id = request.GET.get('pid')
+        proxyaccount = ProxyAccount.objects.get(id=proxyaccount_id)
+        if proxyaccount:
+            create_pac(proxyaccount)
+        else:
+            return HttpResponse('failed')
+    elif script_name == 'regen_pac':
+        regen_pac()
+    elif script_name == 'open_listen_port':
+        port_num = request.GET.get('portNum')
+        account_type = request.GET.get('accountType')
+        open_listen_port(port_num, account_type)
+    else:
+        return HttpResponse('no such script')
+    return HttpResponse('success')
+
+
 def create_pac(proxyaccount):
     template_pac = open("./static/myproxy.pac", "r+")
     d = template_pac.read()
@@ -22,33 +41,57 @@ def create_pac(proxyaccount):
     # user_pac.close()
 
 
-def regen_pac(request):
+def regen_pac():
     template_pac = open("./static/myproxy.pac", "r+")
-    d = template_pac.read()
     account_list = ProxyAccount.objects.filter(pac_no__isnull=False)
     print(len(account_list))
     for account in account_list:
         print ("pac_no", account.pac_no)
+        d = template_pac.read()
         d = d.replace("4128", str(account.port))
         user_pac = open('/data/pac/'+str(account.pac_no)+'.pac', 'w+')
         user_pac.write(d)
         user_pac.close()
-    return HttpResponse('success')
 
 
-def open_listen_port(port_num):
+def open_listen_port(port_num, account_type):
     try:
         address = ('166.111.80.96', 4127)
-        print ("connecting")
         socket.setdefaulttimeout(30)
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         sock.connect(address)
-        data = 'addport@'+str(port_num)+'\n'
+        data = 'addport@'+str(port_num)+','+str(account_type)+'\n'
         sock.send(data.encode())
         sock.close()
     except socket.error as e:
         print(e)
-    print ("connected")
+
+
+# java服务还在，只需删去iptables中根据端口号drop规则，不需流量、带宽等
+def reopen_port(port_num):
+    try:
+        address = ('166.111.80.96', 4127)
+        socket.setdefaulttimeout(30)
+        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        sock.connect(address)
+        data = 'reopen@'+str(port_num)+'\n'
+        sock.send(data.encode())
+        sock.close()
+    except socket.error as e:
+        print(e)
+
+
+def reopen_port(port_num):
+    try:
+        address = ('166.111.80.96', 4127)
+        socket.setdefaulttimeout(30)
+        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        sock.connect(address)
+        data = 'reopen@'+str(port_num)+'\n'
+        sock.send(data.encode())
+        sock.close()
+    except socket.error as e:
+        print(e)
 
 
 def get_port_num():
@@ -62,7 +105,6 @@ def get_port_num():
 @login_required(login_url="/login/")
 def homepage(request):
     userLoginSuccess = request.user.is_authenticated()
-    # duser = DUser.objects.get(user=request.user)
     user = request.user
     pageName = "homepage"
     proxyaccount = ProxyAccount.objects.get(user=request.user)
