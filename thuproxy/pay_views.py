@@ -52,7 +52,8 @@ def alipay_create_orders(request):
     proxyaccount = ProxyAccount.objects.get(user=request.user)
     # todo
     m = request.POST['money']
-    money = float(m)/100
+    money = float(m)/10
+    month = round(money, 2)
     pay_type = request.POST['pay_type']
     month = request.POST['month']
     today = datetime.datetime.now()
@@ -146,7 +147,7 @@ def alipay_callback(request):
                 print ('paytype', pay_type)
                 print ('month',month)
                 # todo
-                real_fee = float(total_fee)*100
+                real_fee = float(total_fee)*10
                 print ('realfee',real_fee)
 
                 if pay_type == 1:
@@ -261,12 +262,9 @@ def alipay_test(request):
     pay_type = int(request.POST['pay_type'])
     month = int(request.POST['month'])
     total_fee = float(request.POST['money'])
-    total_fee /= 100
+    total_fee /= 10
     proxyaccount = ProxyAccount.objects.get(user=request.user)
-    if float(total_fee) == 0.10:
-        real_fee = float(total_fee) * 10
-    else:
-        real_fee = float(total_fee*100)
+    real_fee = float(total_fee*10)
     print ('realfee',real_fee)
 
     if pay_type == 1:
