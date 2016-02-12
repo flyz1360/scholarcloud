@@ -53,7 +53,7 @@ def alipay_create_orders(request):
     # todo
     m = request.POST['money']
     money = float(m)/10
-    month = round(money, 2)
+    money = round(money, 2)
     pay_type = request.POST['pay_type']
     month = request.POST['month']
     today = datetime.datetime.now()
