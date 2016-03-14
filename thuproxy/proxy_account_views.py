@@ -96,7 +96,7 @@ def get_port_num():
 
 def update_flow():
     try:
-        os.mkdir('./test')
+        os.mkdir('/home/ubuntu-user/test')
     except socket.error as e:
         print(e)
 
