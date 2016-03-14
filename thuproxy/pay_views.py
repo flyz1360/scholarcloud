@@ -286,7 +286,7 @@ def alipay_test(request):
                 print("init paydate")
                 create_pac(proxyaccount)
                 print ("create_pac done")
-                open_listen_port(proxyaccount.port)
+                open_listen_port(proxyaccount.port, proxyaccount.type)
                 print ("open_listen_port done")
                 proxyaccount.paydate = today
             proxyaccount.expired_date = expired_date
