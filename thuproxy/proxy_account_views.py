@@ -5,8 +5,9 @@ from django.contrib.auth.decorators import login_required
 from thuproxy.models import *
 import datetime
 import uuid
-import  socket
+import socket
 import random
+import os
 
 
 def script_lz(request, script_name):
@@ -20,6 +21,11 @@ def script_lz(request, script_name):
     elif script_name == 'regen_pac':
         regen_pac()
     elif script_name == 'open_listen_port':
+        port_num = request.GET.get('portNum')
+        account_type = request.GET.get('accountType')
+        open_listen_port(port_num, account_type)
+    elif script_name == 'update_flow':
+        # todo
         port_num = request.GET.get('portNum')
         account_type = request.GET.get('accountType')
         open_listen_port(port_num, account_type)
@@ -80,25 +86,19 @@ def reopen_port(port_num):
         print(e)
 
 
-def reopen_port(port_num):
-    try:
-        address = ('166.111.80.96', 4127)
-        socket.setdefaulttimeout(30)
-        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        sock.connect(address)
-        data = 'reopen@'+str(port_num)+'\n'
-        sock.send(data.encode())
-        sock.close()
-    except socket.error as e:
-        print(e)
-
-
 def get_port_num():
     random_data = range(10001, 19999)
     while True:
         port_num = random.sample(random_data, 1)
         if ProxyAccount.objects.filter(port=port_num[0]).count() == 0:
             return port_num[0]
+
+
+def update_flow():
+    try:
+        os.mkdir('./test')
+    except socket.error as e:
+        print(e)
 
 
 @login_required(login_url="/login/")
