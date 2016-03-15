@@ -39,10 +39,10 @@ def create_pac(proxyaccount):
     print ("pac_no", pac_no)
     proxyaccount.pac_no = pac_no;
     proxyaccount.save()
-    # d = d.replace("4128", str(proxyaccount.port))
-    # user_pac = open('/data/pac/'+str(pac_no)+'.pac', 'w+')
-    # user_pac.write(d)
-    # user_pac.close()
+    d = d.replace("4128", str(proxyaccount.port))
+    user_pac = open('/data/pac/'+str(pac_no)+'.pac', 'w+')
+    user_pac.write(d)
+    user_pac.close()
 
 
 def regen_pac():
