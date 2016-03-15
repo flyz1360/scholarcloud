@@ -63,7 +63,7 @@ def user_logout(request):
 
 
 def validate_username(request):
-    user = User.objects.filter(username=request.GET.get('userName',''))
+    user = User.objects.filter(username=request.GET.get('userName', ''))
     if len(user) == 0:
         message = 'yes'
     else:

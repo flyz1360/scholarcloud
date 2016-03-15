@@ -114,13 +114,13 @@ def alipay_callback(request):
     if sign is None or locSign != sign:
         return HttpResponse("fail")
 
-    print ("sign is ok")
-    if params['trade_status']!='TRADE_FINISHED' and  params['trade_status']!='TRADE_SUCCESS':
+    print("sign is ok")
+    if params['trade_status']!='TRADE_FINISHED' and params['trade_status'] != 'TRADE_SUCCESS':
         return HttpResponse("fail")
     else:
         print("trade status ok")
         print("Verify the request is call by alipay.com....")
-        url = verifyURL['https'] + "&partner=%s&notify_id=%s"%(alipay.conf['partner'],params['notify_id'])
+        url = verifyURL['https'] + "&partner=%s&notify_id=%s" % (alipay.conf['partner'], params['notify_id'])
         print(url)
         response = urllib.request.urlopen(url)
         html = response.read()
@@ -133,30 +133,30 @@ def alipay_callback(request):
                 out_trade_no = params['out_trade_no']
                 trade_no = params['trade_no']
                 total_fee = params['total_fee']
-                pay = Pay.objects.get(out_trade_no = out_trade_no)
+                pay = Pay.objects.get(out_trade_no=out_trade_no)
                 # todo all of return httpResponse
                 if pay.status == 'S':
                     return HttpResponse("S")
 
-                print ('payuser',pay.user)
+                print('payuser', pay.user)
                 proxyaccount = ProxyAccount.objects.get(user=pay.user)
-                print ('proxyaccount',proxyaccount)
-                print ('pay total fee',pay.total_fee)
+                print('proxyaccount', proxyaccount)
+                print('pay total fee', pay.total_fee)
                 month = pay.month
                 pay_type = pay.type
-                print ('paytype', pay_type)
-                print ('month',month)
+                print('paytype', pay_type)
+                print('month', month)
                 # todo
                 real_fee = float(total_fee)*10
-                print ('realfee',real_fee)
+                print('realfee', real_fee)
 
                 if pay_type == 1:
                     account_type = int(real_fee)/int(month)
                     print("accounttype", account_type)
-                    if account_type not in {1,5,10,20,50}:
+                    if account_type not in {1, 5, 10, 20, 50}:
                         return HttpResponse("accout_type_error")
                     else:
-                        print("success:",account_type," month",month)
+                        print("success:", account_type, " month", month)
                         proxyaccount.type = account_type
                         today = datetime.datetime.now()
                         if proxyaccount.expired_date is not None:
@@ -177,10 +177,10 @@ def alipay_callback(request):
                     if account_type != proxyaccount.type or proxyaccount.expired_date is None:
                         return HttpResponse("accout_type_error")
                     else:
-                        print("success:",account_type," month",month)
+                        print("success:", account_type, " month", month)
                         today = datetime.date.today()
                         print("add month")
-                        if proxyaccount.expired_date < today:  #  欠费啦
+                        if proxyaccount.expired_date < today:  # 欠费啦
                             expired_date = today + datetime.timedelta(30*int(month))
                             reopen_port(proxyaccount.port)
                         else:
@@ -191,7 +191,7 @@ def alipay_callback(request):
                     upgrade_delta = int(upgrade_delta+0.1)
                     print(upgrade_delta)
                     proxyaccount.type += upgrade_delta
-                    if proxyaccount.type not in {1,5,10,20,50}:
+                    if proxyaccount.type not in {1, 5, 10, 20, 50}:
                         return HttpResponse("accout_type_error")
                 else:
                     pay.status = 'F'
@@ -273,7 +273,7 @@ def alipay_test(request):
         if account_type not in {1,5,10,20,50}:
             return HttpResponse("accout_type_error")
         else:
-            print("success:",account_type," month",month)
+            print("success:", account_type, " month", month)
             proxyaccount.type = account_type
             today = datetime.datetime.now()
             if proxyaccount.expired_date is not None:
@@ -285,9 +285,9 @@ def alipay_test(request):
             if proxyaccount.paydate is None:
                 print("init paydate")
                 create_pac(proxyaccount)
-                print ("create_pac done")
+                print("create_pac done")
                 open_listen_port(proxyaccount.port, proxyaccount.type)
-                print ("open_listen_port done")
+                print("open_listen_port done")
                 proxyaccount.paydate = today
             proxyaccount.expired_date = expired_date
     elif pay_type == 2:
@@ -296,7 +296,7 @@ def alipay_test(request):
         if account_type != proxyaccount.type or proxyaccount.expired_date is None:
             return HttpResponse("accout_type_error")
         else:
-            print("success:",account_type," month",month)
+            print("success:", account_type, " month", month)
             today = datetime.date.today()
             print("add month")
             if proxyaccount.expired_date < today:

@@ -10,6 +10,9 @@ import random
 import os
 
 
+ACCOUNT_TRAFFIC_LIMIT = {1:100, 5:1000, 10:10000, 20:25000, 50:100000}
+
+
 def script_lz(request, script_name):
     if script_name == 'create_pac':
         proxyaccount_id = request.GET.get('pid')
@@ -36,8 +39,8 @@ def create_pac(proxyaccount):
     template_pac = open("./static/myproxy.pac", "r+")
     d = template_pac.read()
     pac_no = uuid.uuid1()
-    print ("pac_no", pac_no)
-    proxyaccount.pac_no = pac_no;
+    print("pac_no", pac_no)
+    proxyaccount.pac_no = pac_no
     proxyaccount.save()
     d = d.replace("4128", str(proxyaccount.port))
     user_pac = open('/data/pac/'+str(pac_no)+'.pac', 'w+')
@@ -84,6 +87,20 @@ def reopen_port(port_num):
         print(e)
 
 
+# todo 添加iptables规则drop
+def close_port(port_num):
+    try:
+        address = ('166.111.80.96', 4127)
+        socket.setdefaulttimeout(30)
+        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        sock.connect(address)
+        data = 'close@'+str(port_num)+'\n'
+        sock.send(data.encode())
+        sock.close()
+    except socket.error as e:
+        print(e)
+
+
 def get_port_num():
     random_data = range(10001, 19999)
     while True:
@@ -105,22 +122,35 @@ def update_flow():
                 sock.send(data.encode())
                 message = sock.recv(1024)
                 traffic = float(message)
-                # todo 如果超流量则发消息提示超流量；如果流量减少（月初）则reopen
+                # todo 如果超流量则发消息提示超流量；如果流量减少
+                # 已经超过流量
+                if float(accout.traffic) > ACCOUNT_TRAFFIC_LIMIT[int(accout.type)]:
+                    if traffic != float(accout.traffic):
+                        f = open('/data/over_traffic/'+str(accout.port), 'wb')
+                        f.write(traffic+','+accout.traffic)
+                        f.close()
+                    continue
+
                 if traffic > float(accout.traffic):
                     accout.traffic = traffic
                 elif traffic < float(accout.traffic):
                     accout.traffic = float(accout.traffic) + traffic
                 # 超流量
-
+                if float(accout.traffic) > ACCOUNT_TRAFFIC_LIMIT[int(accout.type)]:
+                    close_port(int(accout.port))
                 accout.save()
                 sock.close()
     except Exception as e:
         print(e)
 
 
-# 数据库中traffic清零
+# todo 数据库中traffic清零同时reopen所有port（其实也可不用，那边iptables-F了）
 def flush_flow():
-    return
+    account_list = ProxyAccount.objects.filter(pac_no__isnull=False)
+    if account_list is not None:
+        for accout in account_list:
+            accout.traffic = 0
+            accout.save()
 
 
 @login_required(login_url="/login/")

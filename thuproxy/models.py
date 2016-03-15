@@ -15,6 +15,7 @@ class ProxyAccount(models.Model):
     traffic = models.FloatField()
     pac_no = models.CharField(blank=True, null=True, max_length=255)
 
+
 class Pay(models.Model):
     out_trade_no = models.CharField(max_length=255)
     user = models.ForeignKey(User)
