@@ -116,5 +116,6 @@ logging.basicConfig(
 )
 
 CRONJOBS = [
-    ('15 * * * *', 'thuproxy.proxy_account.views.cron.update_flow'),
+    ('58 * * * *', 'thuproxy.proxy_account_views.update_flow'),
+    ('05 0 1 * *', 'thuproxy.proxy_account_views.flush_flow'),
 ]

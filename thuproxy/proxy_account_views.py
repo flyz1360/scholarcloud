@@ -26,9 +26,7 @@ def script_lz(request, script_name):
         open_listen_port(port_num, account_type)
     elif script_name == 'update_flow':
         # todo
-        port_num = request.GET.get('portNum')
-        account_type = request.GET.get('accountType')
-        open_listen_port(port_num, account_type)
+        update_flow()
     else:
         return HttpResponse('no such script')
     return HttpResponse('success')
@@ -51,7 +49,7 @@ def regen_pac():
     account_list = ProxyAccount.objects.filter(pac_no__isnull=False)
     print(len(account_list))
     for account in account_list:
-        print ("pac_no", account.pac_no)
+        print("pac_no", account.pac_no)
         d = open("./static/myproxy.pac", "r+").read()
         d = d.replace("4128", str(account.port))
         user_pac = open('/data/pac/'+str(account.pac_no)+'.pac', 'w+')
@@ -96,9 +94,33 @@ def get_port_num():
 
 def update_flow():
     try:
-        os.mkdir('./test')
-    except socket.error as e:
+        account_list = ProxyAccount.objects.filter(pac_no__isnull=False)
+        if account_list is not None:
+            for accout in account_list:
+                address = ('166.111.80.96', 4127)
+                socket.setdefaulttimeout(30)
+                sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+                sock.connect(address)
+                data = 'getflow@'+str(accout.port)+'\n'
+                sock.send(data.encode())
+                message = sock.recv(1024)
+                traffic = float(message)
+                # todo 如果超流量则发消息提示超流量；如果流量减少（月初）则reopen
+                if traffic > float(accout.traffic):
+                    accout.traffic = traffic
+                elif traffic < float(accout.traffic):
+                    accout.traffic = float(accout.traffic) + traffic
+                # 超流量
+
+                accout.save()
+                sock.close()
+    except Exception as e:
         print(e)
+
+
+# 数据库中traffic清零
+def flush_flow():
+    return
 
 
 @login_required(login_url="/login/")

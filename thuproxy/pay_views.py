@@ -309,8 +309,9 @@ def alipay_test(request):
         upgrade_delta = int(upgrade_delta+0.1)
         print(upgrade_delta)
         proxyaccount.type += upgrade_delta
-        if proxyaccount.type not in {1,5,10,20,50}:
+        if proxyaccount.type not in {1, 5, 10, 20, 50}:
             return HttpResponse("accout_type_error")
+        reopen_port(proxyaccount.port)
     else:
         return HttpResponse("fail")
     print("sava proxyaccount")
