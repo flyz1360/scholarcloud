@@ -8,6 +8,7 @@ import uuid
 import socket
 import random
 import os
+import httplib
 
 
 ACCOUNT_TRAFFIC_LIMIT = {1:100, 5:1000, 10:10000, 20:25000, 50:100000}
@@ -109,9 +110,19 @@ def get_port_num():
             return port_num[0]
 
 
+def update_flow_cron():
+    http_client = httplib.HTTPConnection('localhost', 8000, timeout=30)
+    http_client.request('GET', '/script_lz/update_flow')
+    os.mkdir('success')
+
+
 def update_flow():
+<<<<<<< HEAD
     os.mkdir('/home/ubuntu-user/hehe/')
     print('log update start')
+=======
+    print('log update flow start')
+>>>>>>> 0dc6ed39c97a1eac6a453f753bead5a08cc1bcb9
     try:
         print('log update flow')
         account_list = ProxyAccount.objects.filter(pac_no__isnull=False)
@@ -129,7 +140,7 @@ def update_flow():
                 # todo 已经超过流量，超过100M设置惩罚
                 if float(accout.traffic) > ACCOUNT_TRAFFIC_LIMIT[int(accout.type)]:
                     if (float(accout.traffic) - float(ACCOUNT_TRAFFIC_LIMIT[int(accout.type)])) > 100.0:
-                        f = open('./data/over_traffic/'+str(accout.port), 'a')
+                        f = open('/data/over_traffic/'+str(accout.port), 'a')
                         f.write(str(accout.port)+','+str(traffic)+','+str(accout.traffic))
                         f.close()
                     continue
@@ -173,6 +184,8 @@ def homepage(request):
             proxyaccount.remain_time = None
     else:
         proxyaccount.remain_time = None
+    proxyaccount.traffic_limit = ACCOUNT_TRAFFIC_LIMIT[int(proxyaccount.type)]
+    proxyaccount.traffic = round(proxyaccount.traffic, 2)
     return render_to_response('homepage.html', locals(), context_instance=RequestContext(request))
 
 
