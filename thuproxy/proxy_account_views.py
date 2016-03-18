@@ -111,9 +111,9 @@ def get_port_num():
 
 
 def update_flow_cron():
-    http_client = httplib.HTTPConnection('localhost', 8000, timeout=30)
-    http_client.request('GET', '/script_lz/update_flow')
-    os.mkdir('success')
+    #http_client = httplib.HTTPConnection('localhost', 8000, timeout=30)
+    #http_client.request('GET', '/script_lz/update_flow')
+    os.mkdir('success/')
 
 
 def update_flow():
