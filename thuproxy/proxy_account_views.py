@@ -8,7 +8,7 @@ import uuid
 import socket
 import random
 import os
-import httplib
+import httplib2
 
 
 ACCOUNT_TRAFFIC_LIMIT = {1:100, 5:1000, 10:10000, 20:25000, 50:100000}
@@ -31,6 +31,8 @@ def script_lz(request, script_name):
     elif script_name == 'update_flow':
         # todo
         update_flow()
+    elif script_name == 'flush_flow':
+        flush_flow()
     else:
         return HttpResponse('no such script')
     return HttpResponse('success')
@@ -111,8 +113,8 @@ def get_port_num():
 
 
 def update_flow_cron():
-    http_client = httplib.HTTPConnection('localhost', 8000, timeout=30)
-    http_client.request('GET', '/script_lz/update_flow')
+    http_client = httplib2.HTTPConnectionWithTimeout('localhost', 8000, timeout=30)
+    http_client.request('GET', '/script_lz/update_flow/')
     os.mkdir('success')
 
 
@@ -151,6 +153,11 @@ def update_flow():
                 sock.close()
     except Exception as e:
         print('error', e)
+
+
+def flush_flow_cron():
+    http_client = httplib2.HTTPConnectionWithTimeout('localhost', 8000, timeout=30)
+    http_client.request('GET', '/script_lz/flush_flow/')
 
 
 # todo 数据库中traffic清零同时reopen所有port（其实也可不用，那边iptables-F了）
