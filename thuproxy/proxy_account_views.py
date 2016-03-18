@@ -117,12 +117,7 @@ def update_flow_cron():
 
 
 def update_flow():
-<<<<<<< HEAD
-    os.mkdir('/home/ubuntu-user/hehe/')
-    print('log update start')
-=======
     print('log update flow start')
->>>>>>> 0dc6ed39c97a1eac6a453f753bead5a08cc1bcb9
     try:
         print('log update flow')
         account_list = ProxyAccount.objects.filter(pac_no__isnull=False)
