@@ -123,11 +123,11 @@ def update_flow():
                 message = sock.recv(1024)
                 traffic = float(message)
                 print('log', accout.port, traffic)
-                # todo 已经超过流量，超过1G设置惩罚
+                # todo 已经超过流量，超过100M设置惩罚
                 if float(accout.traffic) > ACCOUNT_TRAFFIC_LIMIT[int(accout.type)]:
                     if (float(accout.traffic) - float(ACCOUNT_TRAFFIC_LIMIT[int(accout.type)])) > 100.0:
-                        f = open('/data/over_traffic/'+str(accout.port), 'wb')
-                        f.write(str(traffic)+','+str(accout.traffic)+','+str(accout.type))
+                        f = open('./data/over_traffic/'+str(accout.port), 'a')
+                        f.write(str(accout.port)+','+str(traffic)+','+str(accout.traffic))
                         f.close()
                     continue
 
