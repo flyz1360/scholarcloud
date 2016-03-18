@@ -127,7 +127,7 @@ def update_flow():
                 if float(accout.traffic) > ACCOUNT_TRAFFIC_LIMIT[int(accout.type)]:
                     if (float(accout.traffic) - float(ACCOUNT_TRAFFIC_LIMIT[int(accout.type)])) > 100.0:
                         f = open('/data/over_traffic/'+str(accout.port), 'wb')
-                        f.write(traffic+','+accout.traffic+','+accout.type)
+                        f.write(str(traffic)+','+str(accout.traffic)+','+str(accout.type))
                         f.close()
                     continue
 
