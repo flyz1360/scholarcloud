@@ -110,7 +110,10 @@ def get_port_num():
 
 
 def update_flow():
+    os.mkdir('/home/ubuntu-user/hehe/')
+    print('log update start')
     try:
+        print('log update flow')
         account_list = ProxyAccount.objects.filter(pac_no__isnull=False)
         if account_list is not None:
             for accout in account_list:
