@@ -122,12 +122,12 @@ def update_flow():
                 sock.send(data.encode())
                 message = sock.recv(1024)
                 traffic = float(message)
-                # todo 如果超流量则发消息提示超流量；如果流量减少
-                # 已经超过流量
+                print('log', accout.port, traffic)
+                # todo 已经超过流量，超过1G设置惩罚
                 if float(accout.traffic) > ACCOUNT_TRAFFIC_LIMIT[int(accout.type)]:
-                    if traffic != float(accout.traffic):
+                    if (float(accout.traffic) - float(ACCOUNT_TRAFFIC_LIMIT[int(accout.type)])) > 100.0:
                         f = open('/data/over_traffic/'+str(accout.port), 'wb')
-                        f.write(traffic+','+accout.traffic)
+                        f.write(traffic+','+accout.traffic+','+accout.type)
                         f.close()
                     continue
 
@@ -141,7 +141,7 @@ def update_flow():
                 accout.save()
                 sock.close()
     except Exception as e:
-        print(e)
+        print('error', e)
 
 
 # todo 数据库中traffic清零同时reopen所有port（其实也可不用，那边iptables-F了）

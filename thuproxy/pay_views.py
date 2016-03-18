@@ -10,6 +10,8 @@ from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render_to_response, RequestContext
 
+RATE = 0.6
+
 @login_required(login_url="/login/")
 def alipay_apply(request, pay_type):
     userLoginSuccess = request.user.is_authenticated()
@@ -52,7 +54,7 @@ def alipay_create_orders(request):
     proxyaccount = ProxyAccount.objects.get(user=request.user)
     # todo
     m = request.POST['money']
-    money = float(m)/10
+    money = float(m) * RATE
     money = round(money, 2)
     pay_type = request.POST['pay_type']
     month = request.POST['month']
@@ -147,7 +149,7 @@ def alipay_callback(request):
                 print('paytype', pay_type)
                 print('month', month)
                 # todo
-                real_fee = float(total_fee)*10
+                real_fee = float(total_fee) / RATE
                 print('realfee', real_fee)
 
                 if pay_type == 1:
@@ -262,9 +264,9 @@ def alipay_test(request):
     pay_type = int(request.POST['pay_type'])
     month = int(request.POST['month'])
     total_fee = float(request.POST['money'])
-    total_fee /= 10
+    total_fee *= RATE
     proxyaccount = ProxyAccount.objects.get(user=request.user)
-    real_fee = float(total_fee*10)
+    real_fee = float(total_fee/RATE)
     print ('realfee',real_fee)
 
     if pay_type == 1:
