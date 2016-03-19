@@ -2,7 +2,10 @@
 import pymysql
 import socket
 import httplib2
+import os
+import shutil
 
 
-http_client = httplib2.HTTPConnectionWithTimeout('localhost', 8000, timeout=30)
-http_client.request('GET', '/script_lz/update_flow/')
+file_names = os.listdir('./proxy/over_flow')
+for filename in file_names:
+    print(filename)

@@ -67,9 +67,12 @@
         {% if proxyaccount.remain_time > 0 and proxyaccount.traffic < proxyaccount.traffic_limit%}
             <p align="center">自动配置URL：<label>http://pac.scholar.thucloud.com/{{ proxyaccount.pac_no }}.pac</label></p>
             <p align="center">详情请查看<a href="/guide">配置说明</a></p>
-        {% else%}
+        {% elif proxyaccount.remain_time <= 0%}
             <p align="center">您已欠费</p>
             <p align="center">请点击<a href="/alipay/apply/continue">续费 </a></p>
+        {% elif proxyaccount.traffic >= proxyaccount.traffic_limit%}
+            <p align="center">您已超过流量</p>
+            <p align="center">请点击<a href="/alipay/apply/upgrade">升级 </a></p>
         {% endif %}
     {% endif %}
 {% endblock %}
