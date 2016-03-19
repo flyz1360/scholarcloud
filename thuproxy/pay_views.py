@@ -195,6 +195,8 @@ def alipay_callback(request):
                     proxyaccount.type += upgrade_delta
                     if proxyaccount.type not in {1, 5, 10, 20, 50}:
                         return HttpResponse("accout_type_error")
+                    if ACCOUNT_TRAFFIC_LIMIT[int(proxyaccount.type)] > proxyaccount.traffic:
+                        reopen_port(proxyaccount.port)
                 else:
                     pay.status = 'F'
                     pay.save()
