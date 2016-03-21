@@ -192,6 +192,9 @@ def alipay_callback(request):
                                 expired_date = proxyaccount.expired_date + datetime.timedelta(30*int(month))
                             proxyaccount.expired_date = expired_date
                     elif pay_type == 3:
+                        today = datetime.date.today()
+                        if proxyaccount.expired_date < today:  # 欠费啦
+                            return HttpResponse("fail")
                         upgrade_delta = (real_fee/month)*30
                         upgrade_delta = int(upgrade_delta+0.1)
                         print(upgrade_delta)
