@@ -106,7 +106,6 @@ def alipay_repay_orders(request, pay_no):
 def alipay_callback(request):
     params = request.POST.dict()
     print("call back params")
-    print(params)
     alipay = Alipay()
     sign = None
     if 'sign' in params:

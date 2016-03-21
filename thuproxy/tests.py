@@ -5,7 +5,5 @@ import httplib2
 import os
 import shutil
 
-
-file_names = os.listdir('./proxy/over_flow')
-for filename in file_names:
-    print(filename)
+a = {}
+print(a)

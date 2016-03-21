@@ -118,7 +118,6 @@ def update_flow_cron():
 
 
 def update_flow():
-    print('log update flow start')
     try:
         print('log update flow')
         account_list = ProxyAccount.objects.filter(pac_no__isnull=False)
@@ -132,7 +131,6 @@ def update_flow():
                 sock.send(data.encode())
                 message = sock.recv(1024)
                 traffic = float(message)
-                print('log', accout.port, traffic)
                 # todo 已经超过流量，超过100M设置惩罚
                 if float(accout.traffic) > ACCOUNT_TRAFFIC_LIMIT[int(accout.type)]:
                     if (float(accout.traffic) - float(ACCOUNT_TRAFFIC_LIMIT[int(accout.type)])) > 100.0:
