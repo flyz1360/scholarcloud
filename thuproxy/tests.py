@@ -6,4 +6,5 @@ import os
 import shutil
 
 a = {}
-print(a)
+if isinstance(a, dict):
+    print('true')

@@ -9,6 +9,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render_to_response, RequestContext
+import types
 
 RATE = 0.6
 
@@ -105,6 +106,8 @@ def alipay_repay_orders(request, pay_no):
 @csrf_exempt
 def alipay_callback(request):
     params = request.POST.dict()
+    if not isinstance(params, dict):
+        print('error params not dict')
     print("call back params")
     alipay = Alipay()
     sign = None
