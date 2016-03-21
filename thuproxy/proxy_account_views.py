@@ -118,6 +118,23 @@ def get_port_num():
             return port_num[0]
 
 
+def get_ip_address(port_num):
+    ip_address = None
+    try:
+        address = ('166.111.80.96', 4127)
+        socket.setdefaulttimeout(30)
+        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        sock.connect(address)
+        data = 'getIP@'+str(port_num)+'\n'
+        sock.send(data.encode())
+        message = sock.recv(1024)
+        ip_address = message.decode('utf-8')
+        sock.close()
+    except socket.error as e:
+        print(e)
+    return ip_address
+
+
 def update_flow_cron():
     http_client = httplib2.HTTPConnectionWithTimeout('localhost', 8000, timeout=30)
     http_client.request('GET', '/script_lz/update_flow/')
@@ -208,6 +225,7 @@ def homepage(request):
         proxyaccount.remain_time = None
     proxyaccount.traffic_limit = ACCOUNT_TRAFFIC_LIMIT[int(proxyaccount.type)]
     proxyaccount.traffic = round(proxyaccount.traffic, 2)
+    proxyaccount.ip_address = get_ip_address(proxyaccount.port)
     return render_to_response('homepage.html', locals(), context_instance=RequestContext(request))
 
 
