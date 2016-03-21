@@ -105,114 +105,117 @@ def alipay_repay_orders(request, pay_no):
 
 @csrf_exempt
 def alipay_callback(request):
-    params = request.POST.dict()
-    if not isinstance(params, dict):
-        print('error params not dict')
-    print("call back params")
-    alipay = Alipay()
-    sign = None
-    if 'sign' in params:
-        sign = params['sign']
-    locSign = alipay.buildSign(params)
+    try:
+        params = request.POST.dict()
+        if not isinstance(params, dict):
+            print('error params not dict')
+        print("call back params")
+        alipay = Alipay()
+        sign = None
+        if 'sign' in params:
+            sign = params['sign']
+        locSign = alipay.buildSign(params)
 
-    if sign is None or locSign != sign:
-        return HttpResponse("fail")
+        if sign is None or locSign != sign:
+            return HttpResponse("fail")
 
-    print("sign is ok")
-    if params['trade_status']!='TRADE_FINISHED' and params['trade_status'] != 'TRADE_SUCCESS':
-        return HttpResponse("fail")
-    else:
-        print("trade status ok")
-        print("Verify the request is call by alipay.com....")
-        url = verifyURL['https'] + "&partner=%s&notify_id=%s" % (alipay.conf['partner'], params['notify_id'])
-        print(url)
-        response = urllib.request.urlopen(url)
-        html = response.read()
+        print("sign is ok")
+        if params['trade_status']!='TRADE_FINISHED' and params['trade_status'] != 'TRADE_SUCCESS':
+            return HttpResponse("fail")
+        else:
+            print("trade status ok")
+            print("Verify the request is call by alipay.com....")
+            url = verifyURL['https'] + "&partner=%s&notify_id=%s" % (alipay.conf['partner'], params['notify_id'])
+            print(url)
+            response = urllib.request.urlopen(url)
+            html = response.read()
 
-        print("aliypay.com return: %s" % html)
-        if html == b'true':
-            print('result is true')
-             # todo change iftrue to try
-            if True:
-                out_trade_no = params['out_trade_no']
-                trade_no = params['trade_no']
-                total_fee = params['total_fee']
-                pay = Pay.objects.get(out_trade_no=out_trade_no)
-                # todo all of return httpResponse
-                if pay.status == 'S':
-                    return HttpResponse("S")
+            print("aliypay.com return: %s" % html)
+            if html == b'true':
+                print('result is true')
+                 # todo change iftrue to try
+                if True:
+                    out_trade_no = params['out_trade_no']
+                    trade_no = params['trade_no']
+                    total_fee = params['total_fee']
+                    pay = Pay.objects.get(out_trade_no=out_trade_no)
+                    # todo all of return httpResponse
+                    if pay.status == 'S':
+                        return HttpResponse("S")
 
-                print('payuser', pay.user)
-                proxyaccount = ProxyAccount.objects.get(user=pay.user)
-                print('proxyaccount', proxyaccount)
-                print('pay total fee', pay.total_fee)
-                month = pay.month
-                pay_type = pay.type
-                print('paytype', pay_type)
-                print('month', month)
-                # todo
-                real_fee = float(total_fee) / RATE
-                print('realfee', real_fee)
+                    print('payuser', pay.user)
+                    proxyaccount = ProxyAccount.objects.get(user=pay.user)
+                    print('proxyaccount', proxyaccount)
+                    print('pay total fee', pay.total_fee)
+                    month = pay.month
+                    pay_type = pay.type
+                    print('paytype', pay_type)
+                    print('month', month)
+                    # todo
+                    real_fee = float(total_fee) / RATE
+                    print('realfee', real_fee)
 
-                if pay_type == 1:
-                    account_type = int(real_fee)/int(month)
-                    print("accounttype", account_type)
-                    if account_type not in {1, 5, 10, 20, 50}:
-                        return HttpResponse("accout_type_error")
-                    else:
-                        print("success:", account_type, " month", month)
-                        proxyaccount.type = account_type
-                        today = datetime.datetime.now()
-                        if proxyaccount.expired_date is not None:
-                            return HttpResponse("not init")
+                    if pay_type == 1:
+                        account_type = int(real_fee)/int(month)
+                        print("accounttype", account_type)
+                        if account_type not in {1, 5, 10, 20, 50}:
+                            return HttpResponse("accout_type_error")
                         else:
-                            print("init date")
-                            expired_date = today + datetime.timedelta(30*int(month))
-                        if proxyaccount.paydate is None:
-                            create_pac(proxyaccount)
-                            print("create_pac done")
-                            open_listen_port(proxyaccount.port, proxyaccount.type)
-                            print("open_listen_port done")
-                            proxyaccount.paydate = today
-                        proxyaccount.expired_date = expired_date
-                elif pay_type == 2:  # 续费
-                    account_type = int(real_fee)/int(month)
-                    print("accounttype", account_type)
-                    if account_type != proxyaccount.type or proxyaccount.expired_date is None:
-                        return HttpResponse("accout_type_error")
-                    else:
-                        print("success:", account_type, " month", month)
-                        today = datetime.date.today()
-                        print("add month")
-                        if proxyaccount.expired_date < today:  # 欠费啦
-                            expired_date = today + datetime.timedelta(30*int(month))
+                            print("success:", account_type, " month", month)
+                            proxyaccount.type = account_type
+                            today = datetime.datetime.now()
+                            if proxyaccount.expired_date is not None:
+                                return HttpResponse("not init")
+                            else:
+                                print("init date")
+                                expired_date = today + datetime.timedelta(30*int(month))
+                            if proxyaccount.paydate is None:
+                                create_pac(proxyaccount)
+                                print("create_pac done")
+                                open_listen_port(proxyaccount.port, proxyaccount.type)
+                                print("open_listen_port done")
+                                proxyaccount.paydate = today
+                            proxyaccount.expired_date = expired_date
+                    elif pay_type == 2:  # 续费
+                        account_type = int(real_fee)/int(month)
+                        print("accounttype", account_type)
+                        if account_type != proxyaccount.type or proxyaccount.expired_date is None:
+                            return HttpResponse("accout_type_error")
+                        else:
+                            print("success:", account_type, " month", month)
+                            today = datetime.date.today()
+                            print("add month")
+                            if proxyaccount.expired_date < today:  # 欠费啦
+                                expired_date = today + datetime.timedelta(30*int(month))
+                                reopen_port(proxyaccount.port)
+                            else:
+                                expired_date = proxyaccount.expired_date + datetime.timedelta(30*int(month))
+                            proxyaccount.expired_date = expired_date
+                    elif pay_type == 3:
+                        upgrade_delta = (real_fee/month)*30
+                        upgrade_delta = int(upgrade_delta+0.1)
+                        print(upgrade_delta)
+                        proxyaccount.type += upgrade_delta
+                        if proxyaccount.type not in {1, 5, 10, 20, 50}:
+                            return HttpResponse("accout_type_error")
+                        if ACCOUNT_TRAFFIC_LIMIT[int(proxyaccount.type)] > proxyaccount.traffic:
                             reopen_port(proxyaccount.port)
-                        else:
-                            expired_date = proxyaccount.expired_date + datetime.timedelta(30*int(month))
-                        proxyaccount.expired_date = expired_date
-                elif pay_type == 3:
-                    upgrade_delta = (real_fee/month)*30
-                    upgrade_delta = int(upgrade_delta+0.1)
-                    print(upgrade_delta)
-                    proxyaccount.type += upgrade_delta
-                    if proxyaccount.type not in {1, 5, 10, 20, 50}:
-                        return HttpResponse("accout_type_error")
-                    if ACCOUNT_TRAFFIC_LIMIT[int(proxyaccount.type)] > proxyaccount.traffic:
-                        reopen_port(proxyaccount.port)
-                else:
-                    pay.status = 'F'
-                    pay.save()
-                    return HttpResponse("fail")
+                    else:
+                        pay.status = 'F'
+                        pay.save()
+                        return HttpResponse("fail")
 
-                print("sava pay")
-                pay.status = 'S'
-                pay.trade_no = trade_no
-                pay.total_fee = real_fee
-                pay.save()
-                print("sava proxyaccount")
-                proxyaccount.save()
-            return HttpResponse("success")
-        return HttpResponse("fail")
+                    print("sava pay")
+                    pay.status = 'S'
+                    pay.trade_no = trade_no
+                    pay.total_fee = real_fee
+                    pay.save()
+                    print("sava proxyaccount")
+                    proxyaccount.save()
+                return HttpResponse("success")
+            return HttpResponse("fail")
+    except Exception as e:
+        print(e)
 
 
 @login_required(login_url="/login/")

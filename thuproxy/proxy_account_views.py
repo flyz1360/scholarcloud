@@ -4,6 +4,7 @@ from django.shortcuts import render_to_response, RequestContext
 from django.contrib.auth.decorators import login_required
 from thuproxy.models import *
 import datetime
+import time
 import uuid
 import socket
 import random
@@ -11,7 +12,8 @@ import os
 import httplib2
 
 
-ACCOUNT_TRAFFIC_LIMIT = {1:100, 5:1000, 10:10000, 20:25000, 50:100000}
+ACCOUNT_TRAFFIC_LIMIT = {1: 100, 5: 1000, 10: 10000, 20: 25000, 50: 100000}
+CLOSE_REASON = {'over_flow': 1, 'expired': 2}
 
 
 def script_lz(request, script_name):
@@ -33,6 +35,10 @@ def script_lz(request, script_name):
         update_flow()
     elif script_name == 'flush_flow':
         flush_flow()
+    elif script_name == 'judge_expire':
+        judge_expire()
+    elif script_name == 'test':
+        judge_expire()
     else:
         return HttpResponse('no such script')
     return HttpResponse('success')
@@ -90,14 +96,14 @@ def reopen_port(port_num):
         print(e)
 
 
-# todo 添加iptables规则drop
-def close_port(port_num):
+# 超过流量或者过期
+def close_port(port_num, reason):
     try:
         address = ('166.111.80.96', 4127)
         socket.setdefaulttimeout(30)
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         sock.connect(address)
-        data = 'close@'+str(port_num)+'\n'
+        data = 'close@'+str(port_num)+','+str(reason)+'\n'
         sock.send(data.encode())
         sock.close()
     except socket.error as e:
@@ -122,9 +128,10 @@ def update_flow():
         print('log update flow')
         account_list = ProxyAccount.objects.filter(pac_no__isnull=False)
         if account_list is not None:
+            address = ('166.111.80.96', 4127)
+            socket.setdefaulttimeout(30)
+
             for accout in account_list:
-                address = ('166.111.80.96', 4127)
-                socket.setdefaulttimeout(30)
                 sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
                 sock.connect(address)
                 data = 'getflow@'+str(accout.port)+'\n'
@@ -145,7 +152,7 @@ def update_flow():
                     accout.traffic = float(accout.traffic) + traffic
                 # 超流量
                 if float(accout.traffic) > ACCOUNT_TRAFFIC_LIMIT[int(accout.type)]:
-                    close_port(int(accout.port))
+                    close_port(int(accout.port), CLOSE_REASON['over_flow'])
                 accout.save()
                 sock.close()
     except Exception as e:
@@ -161,9 +168,25 @@ def flush_flow_cron():
 def flush_flow():
     account_list = ProxyAccount.objects.filter(pac_no__isnull=False)
     if account_list is not None:
-        for accout in account_list:
-            accout.traffic = 0
-            accout.save()
+        for account in account_list:
+            account.traffic = 0
+            account.save()
+
+
+def judge_expire_cron():
+    http_client = httplib2.HTTPConnectionWithTimeout('localhost', 8000, timeout=30)
+    http_client.request('GET', '/script_lz/judge_expire/')
+
+
+def judge_expire():
+    try:
+        today = datetime.date.today()
+        account_list = ProxyAccount.objects.filter(expired_date=today)
+        if account_list is not None:
+            for account in account_list:
+                close_port(account.port, CLOSE_REASON['expired'])
+    except Exception as e:
+        print(e)
 
 
 @login_required(login_url="/login/")
