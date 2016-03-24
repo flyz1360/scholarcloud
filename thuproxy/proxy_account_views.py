@@ -225,6 +225,8 @@ def homepage(request):
     else:
         proxyaccount.remain_time = None
     proxyaccount.traffic_limit = ACCOUNT_TRAFFIC_LIMIT[int(proxyaccount.type)]
+    if proxyaccount.traffic is None:
+        proxyaccount.traffic = 0
     proxyaccount.traffic = round(proxyaccount.traffic, 2)
     proxyaccount.ip_address = get_ip_address(proxyaccount.port)
     return render_to_response('homepage.html', locals(), context_instance=RequestContext(request))
