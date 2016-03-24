@@ -1,9 +1,6 @@
 #coding=utf-8
 import pymysql
 import socket
-import httplib2
-import os
-import shutil
 import datetime
 ACCOUNT_TRAFFIC_LIMIT = {1: 100, 5: 1000, 10: 10000, 20: 25000, 50: 100000}
 

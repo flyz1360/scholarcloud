@@ -166,7 +166,12 @@ def update_flow():
                 if traffic > float(accout.traffic):
                     accout.traffic = traffic
                 elif traffic < float(accout.traffic):
-                    accout.traffic = float(accout.traffic) + traffic
+                    data = 'preflow@'+str(accout.port)+'\n'
+                    sock.send(data.encode())
+                    message = sock.recv(1024)
+                    traffic_pre = float(message)
+                    accout.traffic = float(accout.traffic) + (traffic - traffic_pre)
+
                 # 超流量
                 if float(accout.traffic) > ACCOUNT_TRAFFIC_LIMIT[int(accout.type)]:
                     close_port(int(accout.port), CLOSE_REASON['over_flow'])
