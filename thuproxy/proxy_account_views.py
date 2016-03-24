@@ -174,6 +174,7 @@ def update_flow():
                         message = sock1.recv(1024)
                         sock1.close()
                         traffic_pre = float(message)
+                        print('pre flow '+str(traffic_pre))
                         if traffic >= traffic_pre:
                             accout.traffic = float(accout.traffic) + (traffic - traffic_pre)
                         else:
@@ -230,19 +231,23 @@ def homepage(request):
     if "error" in request.session:
         error = request.session['error']
         del request.session['error']
-    if proxyaccount.expired_date is not None:
+
+    # 是否付过费
+    if proxyaccount.type != 0:
         if datetime.datetime.now().date() <= proxyaccount.expired_date:
             remain_time = proxyaccount.expired_date - datetime.datetime.now().date()
             proxyaccount.remain_time = int(remain_time.days)
         else:
             proxyaccount.remain_time = None
+
+        proxyaccount.traffic_limit = ACCOUNT_TRAFFIC_LIMIT[int(proxyaccount.type)]
+        proxyaccount.traffic = round(proxyaccount.traffic, 2)
+        proxyaccount.ip_address = get_ip_address(proxyaccount.port)
     else:
         proxyaccount.remain_time = None
-    proxyaccount.traffic_limit = ACCOUNT_TRAFFIC_LIMIT[int(proxyaccount.type)]
-    if proxyaccount.traffic is None:
         proxyaccount.traffic = 0
-    proxyaccount.traffic = round(proxyaccount.traffic, 2)
-    proxyaccount.ip_address = get_ip_address(proxyaccount.port)
+        proxyaccount.ip_address = None
+
     return render_to_response('homepage.html', locals(), context_instance=RequestContext(request))
 
 
