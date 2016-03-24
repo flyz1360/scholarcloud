@@ -166,11 +166,12 @@ def update_flow():
                 if traffic > float(accout.traffic):
                     accout.traffic = traffic
                 elif traffic < float(accout.traffic):
-                    sock.close()
-                    sock.connect(address)
+                    sock1 = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+                    sock1.connect(address)
                     data = 'preflow@'+str(accout.port)+'\n'
-                    sock.send(data.encode())
-                    message = sock.recv(1024)
+                    sock1.send(data.encode())
+                    message = sock1.recv(1024)
+                    sock1.close()
                     traffic_pre = float(message)
                     accout.traffic = float(accout.traffic) + (traffic - traffic_pre)
 
