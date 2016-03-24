@@ -149,38 +149,44 @@ def update_flow():
             socket.setdefaulttimeout(30)
 
             for accout in account_list:
-                sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-                sock.connect(address)
-                data = 'getflow@'+str(accout.port)+'\n'
-                sock.send(data.encode())
-                message = sock.recv(1024)
-                traffic = float(message)
-                # todo 已经超过流量，超过100M设置惩罚
-                if float(accout.traffic) > ACCOUNT_TRAFFIC_LIMIT[int(accout.type)]:
-                    if (float(accout.traffic) - float(ACCOUNT_TRAFFIC_LIMIT[int(accout.type)])) > 100.0:
-                        f = open('/data/over_traffic/'+str(accout.port), 'a')
-                        f.write(str(accout.port)+','+str(traffic)+','+str(accout.traffic))
-                        f.close()
-                    continue
+                try:
+                    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+                    sock.connect(address)
+                    data = 'getflow@'+str(accout.port)+'\n'
+                    sock.send(data.encode())
+                    message = sock.recv(1024)
+                    traffic = float(message)
+                    # todo 已经超过流量，超过100M设置惩罚
+                    if float(accout.traffic) > ACCOUNT_TRAFFIC_LIMIT[int(accout.type)]:
+                        if (float(accout.traffic) - float(ACCOUNT_TRAFFIC_LIMIT[int(accout.type)])) > 100.0:
+                            f = open('/data/over_traffic/'+str(accout.port), 'a')
+                            f.write(str(accout.port)+','+str(traffic)+','+str(accout.traffic))
+                            f.close()
+                        continue
 
-                if traffic > float(accout.traffic):
-                    accout.traffic = traffic
-                elif traffic < float(accout.traffic):
-                    sock1 = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-                    sock1.connect(address)
-                    data = 'preflow@'+str(accout.port)+'\n'
-                    sock1.send(data.encode())
-                    message = sock1.recv(1024)
-                    sock1.close()
-                    traffic_pre = float(message)
-                    accout.traffic = float(accout.traffic) + (traffic - traffic_pre)
+                    if traffic > float(accout.traffic):
+                        accout.traffic = traffic
+                    elif traffic < float(accout.traffic):
+                        sock1 = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+                        sock1.connect(address)
+                        data = 'preflow@'+str(accout.port)+'\n'
+                        sock1.send(data.encode())
+                        message = sock1.recv(1024)
+                        sock1.close()
+                        traffic_pre = float(message)
+                        if traffic >= traffic_pre:
+                            accout.traffic = float(accout.traffic) + (traffic - traffic_pre)
+                        else:
+                            accout.traffic = float(accout.traffic) + traffic
 
-                # 超流量
-                if float(accout.traffic) > ACCOUNT_TRAFFIC_LIMIT[int(accout.type)]:
-                    close_port(int(accout.port), CLOSE_REASON['over_flow'])
-                print('update '+str(accout.port)+' '+str(traffic)+' for '+str(accout.traffic))
-                accout.save()
-                sock.close()
+                    # 超流量
+                    if float(accout.traffic) > ACCOUNT_TRAFFIC_LIMIT[int(accout.type)]:
+                        close_port(int(accout.port), CLOSE_REASON['over_flow'])
+                    print('update '+str(accout.port)+' '+str(traffic)+' for '+str(accout.traffic))
+                    accout.save()
+                    sock.close()
+                except Exception as e:
+                    print('error', e)
     except Exception as e:
         print('error', e)
 
