@@ -106,10 +106,10 @@ def alipay_repay_orders(request, pay_no):
 @csrf_exempt
 def alipay_callback(request):
     try:
+        print("call back start")
         params = request.POST.dict()
         if not isinstance(params, dict):
             print('error params not dict')
-        print("call back params")
         alipay = Alipay()
         sign = None
         if 'sign' in params:
@@ -121,6 +121,7 @@ def alipay_callback(request):
 
         print("sign is ok")
         if params['trade_status']!='TRADE_FINISHED' and params['trade_status'] != 'TRADE_SUCCESS':
+            print('trade status error')
             return HttpResponse("fail")
         else:
             print("trade status ok")
@@ -134,9 +135,11 @@ def alipay_callback(request):
             if html == b'true':
                 print('result is true')
                  # todo change iftrue to try
-                if True:
+                try:
                     out_trade_no = params['out_trade_no']
+                    print('out trade no ', out_trade_no)
                     trade_no = params['trade_no']
+                    print('trade no ', trade_no)
                     total_fee = params['total_fee']
                     pay = Pay.objects.get(out_trade_no=out_trade_no)
                     # todo all of return httpResponse
@@ -215,7 +218,12 @@ def alipay_callback(request):
                     pay.save()
                     print("sava proxyaccount")
                     proxyaccount.save()
-                return HttpResponse("success")
+
+                    return HttpResponse("success")
+                except Exception as e:
+                    print(e)
+
+
             return HttpResponse("fail")
     except Exception as e:
         print(e)

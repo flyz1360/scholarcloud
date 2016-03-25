@@ -159,9 +159,10 @@ def update_flow():
                     # todo 已经超过流量，超过100M设置惩罚
                     if float(accout.traffic) > ACCOUNT_TRAFFIC_LIMIT[int(accout.type)]:
                         if (float(accout.traffic) - float(ACCOUNT_TRAFFIC_LIMIT[int(accout.type)])) > 100.0:
-                            f = open('/data/over_traffic/'+str(accout.port), 'a')
-                            f.write(str(accout.port)+','+str(traffic)+','+str(accout.traffic))
-                            f.close()
+                            if not os.path.exists('/data/over_traffic/'+str(accout.port)):
+                                f = open('/data/over_traffic/'+str(accout.port), 'a')
+                                f.write(str(accout.port)+','+str(traffic)+','+str(accout.traffic))
+                                f.close()
                         continue
 
                     if traffic > float(accout.traffic):
