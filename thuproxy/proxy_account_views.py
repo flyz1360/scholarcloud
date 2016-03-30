@@ -142,6 +142,7 @@ def update_flow_cron():
 
 def update_flow():
     try:
+        print(datetime.datetime.now())
         print('log update flow')
         account_list = ProxyAccount.objects.filter(pac_no__isnull=False)
         if account_list is not None:
@@ -215,6 +216,8 @@ def judge_expire_cron():
 def judge_expire():
     try:
         today = datetime.date.today()
+        print(today)
+        print('judge expire')
         account_list = ProxyAccount.objects.filter(expired_date=today)
         if account_list is not None:
             for account in account_list:

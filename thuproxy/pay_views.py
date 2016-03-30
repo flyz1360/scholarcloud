@@ -106,6 +106,7 @@ def alipay_repay_orders(request, pay_no):
 @csrf_exempt
 def alipay_callback(request):
     try:
+        print(datetime.datetime.now())
         print("call back start")
         params = request.POST.dict()
         if not isinstance(params, dict):
