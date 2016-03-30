@@ -16,8 +16,6 @@ Including another URLconf
 from django.conf.urls import *
 from django.contrib import admin
 
-admin.autodiscover()
-
 
 urlpatterns = patterns('thuproxy.base_views',
                        ('^$', 'index'),

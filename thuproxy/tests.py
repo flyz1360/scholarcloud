@@ -4,7 +4,17 @@ import socket
 import datetime
 ACCOUNT_TRAFFIC_LIMIT = {1: 100, 5: 1000, 10: 10000, 20: 25000, 50: 100000}
 
-print(datetime.datetime.now())
+import os
+from os.path import join,dirname,abspath
+
+PROJECT_DIR = dirname(dirname(abspath(__file__)))#3
+import sys # 4
+sys.path.insert(0,PROJECT_DIR) # 5
+
+os.environ["DJANGO_SETTINGS_MODULE"] = "djangowebsite.settings" # 7
+
+from django.core.wsgi import get_wsgi_application
+application = get_wsgi_application()
 
 # try:
 #     conn=pymysql.connect(host='58.205.208.71',user='root',passwd='thuproxy',port=8779,charset='utf8')
