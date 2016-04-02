@@ -10,8 +10,10 @@ import socket
 import random
 import os
 import httplib2
+from uwsgidecorators import *
 
 
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "djangowebsite.settings")
 ACCOUNT_TRAFFIC_LIMIT = {1: 100, 5: 1000, 10: 10000, 20: 25000, 50: 100000}
 CLOSE_REASON = {'over_flow': 1, 'expired': 2}
 
@@ -135,7 +137,14 @@ def get_ip_address(port_num):
     return ip_address
 
 
-def update_flow_cron():
+@cron(-1, -1, -1, -1, -1)
+def haha(num):
+    print('hahahaha')
+
+
+
+@cron(56, -1, -1, -1, -1)
+def update_flow_cron(num):
     http_client = httplib2.HTTPConnectionWithTimeout('localhost', 8000, timeout=30)
     http_client.request('GET', '/script_lz/update_flow/')
 
@@ -194,12 +203,14 @@ def update_flow():
         print('error', e)
 
 
+# abandoned
 def flush_flow_cron():
     http_client = httplib2.HTTPConnectionWithTimeout('localhost', 8000, timeout=30)
     http_client.request('GET', '/script_lz/flush_flow/')
 
 
 # todo 数据库中traffic清零同时reopen所有port（其实也可不用，那边iptables-F了）
+@cron(1, 0, 1, -1, -1)
 def flush_flow():
     account_list = ProxyAccount.objects.filter(pac_no__isnull=False)
     if account_list is not None:
@@ -208,11 +219,13 @@ def flush_flow():
             account.save()
 
 
+# abandoned
 def judge_expire_cron():
     http_client = httplib2.HTTPConnectionWithTimeout('localhost', 8000, timeout=30)
     http_client.request('GET', '/script_lz/judge_expire/')
 
 
+@cron(57, 23, -1, -1, -1)
 def judge_expire():
     try:
         today = datetime.date.today()

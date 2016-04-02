@@ -28,7 +28,6 @@ DEBUG = False
 
 ALLOWED_HOSTS = ['*']
 
-
 # Application definition
 
 INSTALLED_APPS = (
@@ -120,3 +119,4 @@ CRONJOBS = [
     ('57 23 * * *', 'thuproxy.proxy_account_views.judge_expire_cron'),
     ('01 00 1 * *', 'thuproxy.proxy_account_views.flush_flow_cron'),
 ]
+
