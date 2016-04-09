@@ -1,4 +1,6 @@
 #coding=utf-8
+import django
+django.setup()
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render_to_response, RequestContext
 from django.contrib.auth.decorators import login_required
@@ -34,11 +36,11 @@ def script_lz(request, script_name):
         open_listen_port(port_num, account_type)
     elif script_name == 'update_flow':
         # todo
-        update_flow()
+        update_flow(1)
     elif script_name == 'flush_flow':
-        flush_flow()
+        flush_flow(1)
     elif script_name == 'judge_expire':
-        judge_expire()
+        judge_expire(1)
     elif script_name == 'test':
         judge_expire()
     else:
@@ -137,19 +139,14 @@ def get_ip_address(port_num):
     return ip_address
 
 
-@cron(-1, -1, -1, -1, -1)
-def haha(num):
-    print('hahahaha')
-
-
-
-@cron(56, -1, -1, -1, -1)
-def update_flow_cron(num):
+# abandoned
+def update_flow_cron():
     http_client = httplib2.HTTPConnectionWithTimeout('localhost', 8000, timeout=30)
     http_client.request('GET', '/script_lz/update_flow/')
 
 
-def update_flow():
+@cron(58, -1, -1, -1, -1)
+def update_flow(num):
     try:
         print(datetime.datetime.now())
         print('log update flow')
@@ -211,7 +208,7 @@ def flush_flow_cron():
 
 # todo 数据库中traffic清零同时reopen所有port（其实也可不用，那边iptables-F了）
 @cron(1, 0, 1, -1, -1)
-def flush_flow():
+def flush_flow(num):
     account_list = ProxyAccount.objects.filter(pac_no__isnull=False)
     if account_list is not None:
         for account in account_list:
@@ -226,7 +223,7 @@ def judge_expire_cron():
 
 
 @cron(57, 23, -1, -1, -1)
-def judge_expire():
+def judge_expire(num):
     try:
         today = datetime.date.today()
         print(today)
