@@ -207,6 +207,8 @@ def alipay_callback(request):
                             return HttpResponse("accout_type_error")
                         if ACCOUNT_TRAFFIC_LIMIT[int(proxyaccount.type)] > proxyaccount.traffic:
                             reopen_port(proxyaccount.port)
+                        # todo 修改带宽
+                        upgrade_port(proxyaccount.port, proxyaccount.type)
                     else:
                         pay.status = 'F'
                         pay.save()

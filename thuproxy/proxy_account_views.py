@@ -114,6 +114,19 @@ def close_port(port_num, reason):
         print(e)
 
 
+def upgrade_port(port_num, account_type):
+    try:
+        address = ('166.111.80.96', 4127)
+        socket.setdefaulttimeout(30)
+        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        sock.connect(address)
+        data = 'close@'+str(port_num)+','+str(account_type)+'\n'
+        sock.send(data.encode())
+        sock.close()
+    except socket.error as e:
+        print(e)
+
+
 def get_port_num():
     random_data = range(10001, 19999)
     while True:
