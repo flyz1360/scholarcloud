@@ -116,7 +116,7 @@ def upgrade_port(port_num, account_type):
         socket.setdefaulttimeout(30)
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         sock.connect(address)
-        data = 'close@'+str(port_num)+','+str(account_type)+'\n'
+        data = 'upgrade@'+str(port_num)+','+str(account_type)+'\n'
         sock.send(data.encode())
         sock.close()
     except socket.error as e:
