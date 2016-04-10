@@ -13,6 +13,9 @@ import random
 import os
 import httplib2
 from uwsgidecorators import *
+import urllib.request
+import urllib.parse
+import json
 
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "djangowebsite.settings")
@@ -152,7 +155,31 @@ def get_ip_address(port_num):
     return ip_address
 
 
-# abandoned
+def get_ip_address_list(port_num):
+    ip_address_list = []
+    try:
+        address = ('166.111.80.96', 4127)
+        socket.setdefaulttimeout(30)
+        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        sock.connect(address)
+        data = 'getIPList@'+str(port_num)+'\n'
+        sock.send(data.encode())
+        message = sock.recv(1024)
+        raw_ips = message.decode('utf-8')
+        ips = raw_ips.split(',')
+        for ip in ips:
+            if ip != '':
+                tmp = ip.split('@')
+                result = dict()
+                result['address'] = tmp[0]
+                result['time'] = tmp[1]
+                ip_address_list.append(result)
+        sock.close()
+    except socket.error as e:
+        print(e)
+    return ip_address_list
+
+
 def update_flow_cron():
     http_client = httplib2.HTTPConnectionWithTimeout('localhost', 8000, timeout=30)
     http_client.request('GET', '/script_lz/update_flow/')
@@ -270,12 +297,41 @@ def homepage(request):
         proxyaccount.traffic_limit = ACCOUNT_TRAFFIC_LIMIT[int(proxyaccount.type)]
         proxyaccount.traffic = round(proxyaccount.traffic, 2)
         proxyaccount.ip_address = get_ip_address(proxyaccount.port)
+
+        # 查询ip地址
+        url = 'http://pv.sohu.com/cityjson?'
+        url_values = urllib.parse.urlencode({'ie':'utf-8', 'ip':proxyaccount.ip_address})
+        full_url = url+url_values
+        ip_data = urllib.request.urlopen(full_url).read()
+        ip_data_unicode = ip_data.decode('utf-8')
+        ip_data_unicode = ip_data_unicode[19:len(ip_data_unicode)-1]
+        result = json.loads(ip_data_unicode, 'utf-8')
+        proxyaccount.city = result['cname']
     else:
         proxyaccount.remain_time = None
         proxyaccount.traffic = 0
         proxyaccount.ip_address = None
 
     return render_to_response('homepage.html', locals(), context_instance=RequestContext(request))
+
+
+@login_required(login_url="/login/")
+def ip_history(request):
+    userLoginSuccess = request.user.is_authenticated()
+    pageName = "homepage"
+    proxyaccount = ProxyAccount.objects.get(user=request.user)
+    ip_list = get_ip_address_list(proxyaccount.port)
+    for ip in ip_list:
+        # 查询ip地址
+        url = 'http://pv.sohu.com/cityjson?'
+        url_values = urllib.parse.urlencode({'ie':'utf-8', 'ip':ip['address']})
+        full_url = url+url_values
+        ip_data = urllib.request.urlopen(full_url).read()
+        ip_data_unicode = ip_data.decode('utf-8')
+        ip_data_unicode = ip_data_unicode[19:len(ip_data_unicode)-1]
+        result = json.loads(ip_data_unicode, 'utf-8')
+        ip['city'] = result['cname']
+    return render_to_response('ip_history.html', locals(), context_instance=RequestContext(request))
 
 
 @login_required(login_url="/login/")

@@ -45,15 +45,15 @@
                         <th style="width: 22%">用户级别</th>
                         <th style="width: 22%">剩余时间</th>
                         <th style="width: 28%">已用流量</th>
-                        <th style="width: 28%">上次登录IP</th>
+                        <th style="width: 28%">上次登录IP<a style=" float: right" href="/">历史记录</a></th>
                     </tr>
                 </thead>
                 <tbody>
                     <tr>
                         <td>{{ proxyaccount.type }}元套餐 <a style="margin-left: 20px" href="/alipay/apply/upgrade"> 升级</a></td>
                         <td>{{ proxyaccount.remain_time }}天 <a style="margin-left: 20px" href="/alipay/apply/continue"> 续费</a></td>
-                        <td>{{ proxyaccount.traffic }} MB <a style="margin-left: 20px" href="/"> 流量曲线</a></td>
-                        <td>{{ proxyaccount.ip_address}}  <a style="margin-left: 20px" href="/">历史记录</a></td>
+                        <td>{{ proxyaccount.traffic }} MB <a title="敬请期待" style="margin-left: 20px" href="/"> 流量曲线</a></td>
+                        <td>{{ proxyaccount.ip_address}}  <u style="float: right">{{ proxyaccount.city }}</u></td>
                     </tr>
                 </tbody>
             </table>
