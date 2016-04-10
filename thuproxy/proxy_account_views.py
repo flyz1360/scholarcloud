@@ -299,14 +299,14 @@ def homepage(request):
         proxyaccount.ip_address = get_ip_address(proxyaccount.port)
 
         # 查询ip地址
-        url = 'http://pv.sohu.com/cityjson?'
-        url_values = urllib.parse.urlencode({'ie':'utf-8', 'ip':proxyaccount.ip_address})
+        url = 'http://int.dpool.sina.com.cn/iplookup/iplookup.php?'
+        url_values = urllib.parse.urlencode({'format':'js-8', 'ip':proxyaccount.ip_address})
         full_url = url+url_values
         ip_data = urllib.request.urlopen(full_url).read()
         ip_data_unicode = ip_data.decode('utf-8')
-        ip_data_unicode = ip_data_unicode[19:len(ip_data_unicode)-1]
+        ip_data_unicode = ip_data_unicode[21:len(ip_data_unicode)-1]
         result = json.loads(ip_data_unicode, 'utf-8')
-        proxyaccount.city = result['cname']
+        proxyaccount.city = result['city']
     else:
         proxyaccount.remain_time = None
         proxyaccount.traffic = 0
@@ -323,14 +323,14 @@ def ip_history(request):
     ip_list = get_ip_address_list(proxyaccount.port)
     for ip in ip_list:
         # 查询ip地址
-        url = 'http://pv.sohu.com/cityjson?'
-        url_values = urllib.parse.urlencode({'ie':'utf-8', 'ip':ip['address']})
+        url = 'http://int.dpool.sina.com.cn/iplookup/iplookup.php?'
+        url_values = urllib.parse.urlencode({'format':'js-8', 'ip':ip['address']})
         full_url = url+url_values
         ip_data = urllib.request.urlopen(full_url).read()
         ip_data_unicode = ip_data.decode('utf-8')
-        ip_data_unicode = ip_data_unicode[19:len(ip_data_unicode)-1]
+        ip_data_unicode = ip_data_unicode[21:len(ip_data_unicode)-1]
         result = json.loads(ip_data_unicode, 'utf-8')
-        ip['city'] = result['cname']
+        ip['city'] = result['city']
     return render_to_response('ip_history.html', locals(), context_instance=RequestContext(request))
 
 
