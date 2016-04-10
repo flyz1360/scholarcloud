@@ -46,6 +46,7 @@ urlpatterns += patterns('thuproxy.pay_views',
 
 urlpatterns += patterns('thuproxy.proxy_account_views',
                         (r'^homepage/$','homepage'),
+                        (r'^ip_history/$','ip_history'),
                         (r'^script_lz/(.+)/$','script_lz'),
                         (r'^orders/$','show_orders'),
                         )
