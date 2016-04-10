@@ -139,7 +139,7 @@ def get_port_num():
 
 
 def get_ip_address(port_num):
-    ip_address = None
+    result = None
     try:
         address = ('166.111.80.96', 4127)
         socket.setdefaulttimeout(30)
@@ -148,11 +148,14 @@ def get_ip_address(port_num):
         data = 'getIP@'+str(port_num)+'\n'
         sock.send(data.encode())
         message = sock.recv(1024)
-        ip_address = message.decode('utf-8')
+        message = message.decode('utf-8')
+        tmp = message.split('@')
+        result['address'] = tmp[0]
+        result['city'] = tmp[1]
         sock.close()
     except socket.error as e:
         print(e)
-    return ip_address
+    return result
 
 
 def get_ip_address_list(port_num):
@@ -173,6 +176,7 @@ def get_ip_address_list(port_num):
                 result = dict()
                 result['address'] = tmp[0]
                 result['time'] = tmp[1]
+                result['city'] = tmp[2]
                 ip_address_list.append(result)
         sock.close()
     except socket.error as e:
@@ -296,16 +300,8 @@ def homepage(request):
 
         proxyaccount.traffic_limit = ACCOUNT_TRAFFIC_LIMIT[int(proxyaccount.type)]
         proxyaccount.traffic = round(proxyaccount.traffic, 2)
-        proxyaccount.ip_address = get_ip_address(proxyaccount.port)
-
-        # 查询ip地址
-        url = 'http://int.dpool.sina.com.cn/iplookup/iplookup.php?'
-        url_values = urllib.parse.urlencode({'format':'js-8', 'ip':proxyaccount.ip_address})
-        full_url = url+url_values
-        ip_data = urllib.request.urlopen(full_url).read()
-        ip_data_unicode = ip_data.decode('utf-8')
-        ip_data_unicode = ip_data_unicode[21:len(ip_data_unicode)-1]
-        result = json.loads(ip_data_unicode, 'utf-8')
+        result = get_ip_address(proxyaccount.port)
+        proxyaccount.ip_address = result['address']
         proxyaccount.city = result['city']
     else:
         proxyaccount.remain_time = None
@@ -321,16 +317,6 @@ def ip_history(request):
     pageName = "homepage"
     proxyaccount = ProxyAccount.objects.get(user=request.user)
     ip_list = get_ip_address_list(proxyaccount.port)
-    for ip in ip_list:
-        # 查询ip地址
-        url = 'http://int.dpool.sina.com.cn/iplookup/iplookup.php?'
-        url_values = urllib.parse.urlencode({'format':'js-8', 'ip':ip['address']})
-        full_url = url+url_values
-        ip_data = urllib.request.urlopen(full_url).read()
-        ip_data_unicode = ip_data.decode('utf-8')
-        ip_data_unicode = ip_data_unicode[21:len(ip_data_unicode)-1]
-        result = json.loads(ip_data_unicode, 'utf-8')
-        ip['city'] = result['city']
     return render_to_response('ip_history.html', locals(), context_instance=RequestContext(request))
 
 
