@@ -135,7 +135,7 @@ def get_port_num():
 
 
 def get_ip_address(port_num):
-    result = None
+    result = {}
     try:
         address = ('166.111.80.96', 4127)
         socket.setdefaulttimeout(30)
