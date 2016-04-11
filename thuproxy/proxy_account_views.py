@@ -243,6 +243,7 @@ def update_flow(num):
                     now = datetime.datetime.now()
                     t = Traffic(user=accout.user, traffic=accout.traffic, time=now)
                     t.save()
+                    print('save success', accout.traffic)
                 except Exception as e:
                     print('error', e)
     except Exception as e:
