@@ -59,7 +59,7 @@ def alipay_create_orders(request):
     money = round(money, 2)
     pay_type = request.POST['pay_type']
     month = request.POST['month']
-    today = datetime.datetime.now()
+    today = timezone.now()
     print(money, pay_type)
     try:
         pay = Pay(out_trade_no=uuid.uuid1().hex, user=user, total_fee=money, type=int(pay_type), month=int(month), status='U', create_date=today)
