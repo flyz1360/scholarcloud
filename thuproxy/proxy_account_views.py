@@ -12,10 +12,7 @@ import socket
 import random
 import os
 import httplib2
-from uwsgidecorators import *
-import urllib.request
-import urllib.parse
-import json
+from django.utils import timezone
 
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "djangowebsite.settings")
@@ -240,7 +237,7 @@ def update_flow(num):
                     sock.close()
 
                     # 记录到数据库
-                    now = datetime.datetime.now()
+                    now = timezone.now()
                     t = Traffic(user=accout.user, traffic=accout.traffic, time=now)
                     t.save()
                     print('save success', accout.traffic)
@@ -333,4 +330,14 @@ def show_orders(request):
     user = request.user
     pay_list = Pay.objects.filter(user_id=user.id)
     return render_to_response('show_orders.html', locals(), context_instance=RequestContext(request))
+
+
+@login_required(login_url="/login/")
+def show_flows(request):
+    userLoginSuccess = request.user.is_authenticated()
+    pageName = "homepage"
+    user = request.user
+    traffic_list = Traffic.objects.filter(user=user)
+    return render_to_response('flow_history.html', locals(), context_instance=RequestContext(request))
+
 
