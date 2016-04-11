@@ -238,6 +238,11 @@ def update_flow(num):
                     print('update '+str(accout.port)+' '+str(traffic)+' for '+str(accout.traffic))
                     accout.save()
                     sock.close()
+
+                    # 记录到数据库
+                    now = datetime.datetime.now()
+                    t = Traffic(user=accout.user, traffic=accout.traffic, time=now)
+                    t.save()
                 except Exception as e:
                     print('error', e)
     except Exception as e:
