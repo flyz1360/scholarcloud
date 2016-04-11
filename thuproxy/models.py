@@ -26,3 +26,9 @@ class Pay(models.Model):
     buy_id = models.CharField(max_length=255)
     buy_email = models.CharField(max_length=255)
     create_date = models.DateTimeField(blank=True, null=True)
+
+
+class Traffic(models.Model):
+    traffic = models.FloatField()
+    user = models.ForeignKey(User)
+    time = models.DateTimeField()
