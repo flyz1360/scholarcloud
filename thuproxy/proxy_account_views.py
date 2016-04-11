@@ -12,6 +12,7 @@ import socket
 import random
 import os
 import httplib2
+from uwsgidecorators import *
 from django.utils import timezone
 
 
