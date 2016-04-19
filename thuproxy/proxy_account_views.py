@@ -6,7 +6,7 @@ from django.shortcuts import render_to_response, RequestContext
 from django.contrib.auth.decorators import login_required
 from thuproxy.models import *
 import datetime
-import time
+import json
 import uuid
 import socket
 import random
@@ -324,6 +324,17 @@ def ip_history(request):
     return render_to_response('ip_history.html', locals(), context_instance=RequestContext(request))
 
 
+@login_required()
+def get_flow_json(request):
+    user_id = request.GET.get('userid')
+    traffic_history = Traffic.objects.filter(user_id=user_id)
+    flow_result_json = []
+    # for traffic in traffic_history:
+    flow_result_json.append([1, 0])
+    flow_result_json.append([1, 0])
+    return HttpResponse(json.dumps(flow_result_json), content_type="application/json")
+
+
 @login_required(login_url="/login/")
 def show_orders(request):
     userLoginSuccess = request.user.is_authenticated()
@@ -340,5 +351,3 @@ def show_flows(request):
     user = request.user
     traffic_list = Traffic.objects.filter(user=user)
     return render_to_response('flow_history.html', locals(), context_instance=RequestContext(request))
-
-

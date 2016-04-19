@@ -1,11 +1,6 @@
 #coding=utf-8
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponse
 from django.shortcuts import render_to_response, RequestContext
-from thuproxy.models import *
-from django.contrib.auth.decorators import login_required
-import datetime
-
-__author__ = 'lz'
 
 
 def index(request):

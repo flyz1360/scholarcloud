@@ -19,7 +19,6 @@ from django.contrib import admin
 
 urlpatterns = patterns('thuproxy.base_views',
                        ('^$', 'index'),
-                       # ('^homepage/$', 'homepage'),
                        ('^guide/$', 'guide'),
                        ('^accoutTypes/$', 'accoutTypes'),
                        (r'^admin/', include(admin.site.urls)),
@@ -48,6 +47,7 @@ urlpatterns += patterns('thuproxy.proxy_account_views',
                         (r'^homepage/$','homepage'),
                         (r'^ip_history/$','ip_history'),
                         (r'^flow_history/$','show_flows'),
+                        ('^getFlow_json/$', 'get_flow_json'),
                         (r'^script_lz/(.+)/$','script_lz'),
                         (r'^orders/$','show_orders'),
                         )
