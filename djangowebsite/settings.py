@@ -24,7 +24,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = 'ep=o3o4rv%@(&h9j*pb^$gcva3z7_346($sqoygradd%y&&nq+'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = ['*']
 
@@ -77,8 +77,7 @@ DATABASES = {
         #'PASSWORD': 'Zstbj2013',
         'PASSWORD': 'thuproxy',
         'HOST': '127.0.0.1',
-
-        # 'OPTIONS': {'init_command': 'SET storage_engine=MyISAM', },
+        # 'PORT': '8779',
     }
 }
 

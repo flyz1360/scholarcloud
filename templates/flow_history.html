@@ -1,12 +1,87 @@
 {% extends "base.html" %}
 
 {% block exteral_js %}
-    <script type="text/javascript" src="/static/lib/d3/d3.min.js"></script>
-{#    <script>#}
-{#$.getJSON("/getFlow_json/", { userid: "2"}, function(json){#}
-{#  alert("s");#}
-{#});#}
-{#    </script>#}
+    <script type="text/javascript" src="/static/lib/highcharts/highcharts.js"></script>
+    <script>
+
+    $(document).ready(function() {
+        var option = {
+            chart: {
+              renderTo: 'container',
+              type: 'column'
+            },
+            title: {
+                text: '每日流量',
+                style:{
+                    fontFamily: 'Microsoft YaHei'
+                }
+
+            },
+            credits:{
+                text:'scholar.thucloud.com',               // 显示的文字
+                href:'http://scholar.thucloud.com'   // 链接地址
+            },
+            xAxis: {
+                title: {
+                    text: '时间',
+                    style:{
+                        fontFamily: 'Microsoft YaHei'
+                    }
+                },
+                type: 'datetime',
+                labels:{
+                    style:{
+                        fontSize: '12',
+                        fontFamily: 'helvetica'
+                    },
+                    formatter:function(){
+                        return Highcharts.dateFormat('%m-%d', this.value);
+                    }
+                }
+            },
+            yAxis: {
+                title: {
+                    text: '流量/(MB)',
+                    style:{
+                        fontFamily: 'Microsoft YaHei'
+                    }
+                }
+            },
+            tooltip: {
+              formatter: function () {
+                  return Highcharts.dateFormat('%Y-%m-%d', this.x) + '<br/>流量' +
+                    Highcharts.numberFormat(this.y, 2)+'M';
+              }
+            },
+            //图例属性
+            legend: {
+                layout: 'vertical',
+                align: 'right',
+                verticalAlign: 'top',
+                borderWidth: 0
+            },
+            series: [{
+                name: '',
+                data: [],
+                showInLegend: false
+            }]
+          };
+
+        $.getJSON("/getFlow_json/", { userid: {{ user.id }}, is_daily:1}, function(traffic_list) {
+            var data = [];
+            for (var i = 0; i < traffic_list.length; i++) {
+                var t = new Date(traffic_list[i].time);
+                data.push({
+                    x: (new Date(traffic_list[i].time)).getTime(),
+                    y: traffic_list[i].traffic
+                    });
+            }
+            option.series[0].data = data;
+            var chart = new Highcharts.Chart(option);
+        });
+
+    });
+    </script>
 {% endblock %}
 
 {% block custom_css %}
@@ -15,14 +90,14 @@
 
 {% block content %}
 
-    <div style="width: 600px; margin-left: auto;margin-right: auto">
+    <div style="width: 800px; margin-left: auto;margin-right: auto">
         <ol class="breadcrumb" style="background-color: transparent">
         <li><a href="/homepage">账户管理</a></li>
         <li class="active">流量图</li>
-</ol>
+        </ol>
 
-        <p>程序猿还没有写好w(ﾟДﾟ)w</p>
-{#       <table class="table" >#}
+        <div id="container" style="min-width:800px;height:400px"></div>
+{#           <table class="table" >#}
 {#            <thead>#}
 {#                <tr><th style="width: 30%">登陆时间</th><th style="width: 30%">IP地址</th><th style="width: 20%">地点</th><th style="width: 22%"></th></tr>#}
 {#            </thead>#}

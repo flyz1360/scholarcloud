@@ -13,6 +13,13 @@ import httplib2
 from django.utils import timezone
 
 
+date_handler = lambda obj: (
+    obj.isoformat()
+    if isinstance(obj, datetime.datetime)
+    or isinstance(obj, datetime.date)
+    else None
+)
+
 ACCOUNT_TRAFFIC_LIMIT = {1: 100, 5: 1000, 10: 10000, 20: 25000, 50: 100000}
 CLOSE_REASON = {'over_flow': 1, 'expired': 2}
 
@@ -317,12 +324,20 @@ def ip_history(request):
 @login_required()
 def get_flow_json(request):
     user_id = request.GET.get('userid')
+    is_daily = int(request.GET.get('is_daily'))
     traffic_history = Traffic.objects.filter(user_id=user_id)
-    flow_result_json = []
-    # for traffic in traffic_history:
-    flow_result_json.append([1, 0])
-    flow_result_json.append([1, 0])
-    return HttpResponse(json.dumps(flow_result_json), content_type="application/json")
+    flow_result_json = list()
+    if is_daily == 1:
+        traffic_acc = traffic_history[0].traffic
+        for traffic in traffic_history:
+            if traffic.time.hour == 15:
+                flow_result_json.append({'time': traffic.time.date(), 'traffic': traffic.traffic-traffic_acc})
+                traffic_acc = traffic.traffic
+    elif is_daily == 0:
+        for traffic in traffic_history:
+            flow_result_json.append({'time': traffic.time.date(), 'traffic': traffic.traffic})
+    result = json.dumps(flow_result_json, default=date_handler)
+    return HttpResponse(result, content_type="application/json")
 
 
 @login_required(login_url="/login/")
