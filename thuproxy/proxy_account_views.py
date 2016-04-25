@@ -14,6 +14,7 @@ import os
 import httplib2
 from uwsgidecorators import *
 from django.utils import timezone
+from urllib import request
 
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "djangowebsite.settings")
@@ -156,7 +157,7 @@ def get_ip_address(port_num):
         message = message.decode('utf-8')
         tmp = message.split('@')
         result['address'] = tmp[0]
-        result['city'] = tmp[1]
+        result['city'] = request.unquote(tmp[1])
         sock.close()
     except socket.error as e:
         print(e)
@@ -181,7 +182,7 @@ def get_ip_address_list(port_num):
                 result = dict()
                 result['address'] = tmp[0]
                 result['time'] = tmp[1]
-                result['city'] = tmp[2]
+                result['city'] = request.unquote(tmp[2])
                 ip_address_list.append(result)
         sock.close()
     except socket.error as e:

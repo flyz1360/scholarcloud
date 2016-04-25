@@ -1,20 +1,22 @@
 #encoding=utf-8
-import urllib
-import urllib.request
-import json
-import sys
+import socket
+from urllib import request
 
+result = {}
 try:
-    url = 'http://int.dpool.sina.com.cn/iplookup/iplookup.php?'
-    url_values = urllib.parse.urlencode({'format':'js-8', 'ip':'106.37.225.179'})
-    full_url = url+url_values
-    # print(full_url)
-    ip_data = urllib.request.urlopen(full_url).read()
-    ip_data_unicode = ip_data.decode('unicode_escape')
-    ip_data_unicode = ip_data_unicode[21:len(ip_data_unicode)-1]
-    print(ip_data_unicode)
-    result = json.loads(ip_data_unicode)
-    print(result)
-    print(result['city'])
-except Exception as e:
+    address = ('166.111.80.96', 4127)
+    socket.setdefaulttimeout(30)
+    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    sock.connect(address)
+    data = 'getIP@'+str(18625)+'\n'
+    sock.send(data.encode())
+    message = sock.recv(1024)
+    message = message.decode('utf-8')
+    tmp = message.split('@')
+    result['address'] = tmp[0]
+    b = tmp[1]
+    b = request.unquote(b)
+    result['city'] = tmp[1]
+    sock.close()
+except socket.error as e:
     print(e)
