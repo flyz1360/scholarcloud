@@ -295,33 +295,37 @@ def judge_expire(num):
 
 @login_required(login_url="/login/")
 def homepage(request):
-    userLoginSuccess = request.user.is_authenticated()
-    user = request.user
-    pageName = "homepage"
-    proxyaccount = ProxyAccount.objects.get(user=request.user)
-    if "error" in request.session:
-        error = request.session['error']
-        del request.session['error']
+    try:
+        userLoginSuccess = request.user.is_authenticated()
+        user = request.user
+        pageName = "homepage"
+        proxyaccount = ProxyAccount.objects.get(user=request.user)
+        if "error" in request.session:
+            error = request.session['error']
+            del request.session['error']
 
-    # 是否付过费
-    if proxyaccount.type != 0:
-        if datetime.datetime.now().date() <= proxyaccount.expired_date:
-            remain_time = proxyaccount.expired_date - datetime.datetime.now().date()
-            proxyaccount.remain_time = int(remain_time.days)
+        # 是否付过费
+        if proxyaccount.type != 0:
+            if datetime.datetime.now().date() <= proxyaccount.expired_date:
+                remain_time = proxyaccount.expired_date - datetime.datetime.now().date()
+                proxyaccount.remain_time = int(remain_time.days)
+            else:
+                proxyaccount.remain_time = None
+
+            proxyaccount.traffic_limit = ACCOUNT_TRAFFIC_LIMIT[int(proxyaccount.type)]
+            proxyaccount.traffic = round(proxyaccount.traffic, 2)
+            result = get_ip_address(proxyaccount.port)
+            proxyaccount.ip_address = result['address']
+            proxyaccount.city = result['city']
         else:
             proxyaccount.remain_time = None
+            proxyaccount.traffic = 0
+            proxyaccount.ip_address = None
 
-        proxyaccount.traffic_limit = ACCOUNT_TRAFFIC_LIMIT[int(proxyaccount.type)]
-        proxyaccount.traffic = round(proxyaccount.traffic, 2)
-        result = get_ip_address(proxyaccount.port)
-        proxyaccount.ip_address = result['address']
-        proxyaccount.city = result['city']
-    else:
-        proxyaccount.remain_time = None
-        proxyaccount.traffic = 0
-        proxyaccount.ip_address = None
-
-    return render_to_response('homepage.html', locals(), context_instance=RequestContext(request))
+        return render_to_response('homepage.html', locals(), context_instance=RequestContext(request))
+    except Exception as e:
+        print(e)
+    return HttpResponse('failed')
 
 
 @login_required(login_url="/login/")
@@ -335,28 +339,32 @@ def ip_history(request):
 
 @login_required()
 def get_flow_json(request):
-    user_id = request.GET.get('userid')
-    is_daily = int(request.GET.get('is_daily'))
-    month = timezone.datetime.strptime(timezone.now().strftime('%Y-%m'), '%Y-%m')
-    traffic_history = Traffic.objects.filter(user_id=30, time__gte=month)
-    flow_result_json = list()
-    tz = pytz.timezone('Asia/Shanghai')
-    if is_daily == 1:
-        traffic_acc = traffic_history[0].traffic
-        day = traffic_history[0].time.astimezone(tz).day
-        for traffic in traffic_history:
-            if traffic is traffic_history[len(traffic_history)-1]:
-                flow_result_json.append({'time': traffic.time.astimezone(tz).date(), 'traffic': traffic.traffic-traffic_acc})
+    try:
+        user_id = request.GET.get('userid')
+        is_daily = int(request.GET.get('is_daily'))
+        month = timezone.datetime.strptime(timezone.now().strftime('%Y-%m'), '%Y-%m')
+        traffic_history = Traffic.objects.filter(user_id=user_id, time__gte=month)
+        flow_result_json = list()
+        tz = pytz.timezone('Asia/Shanghai')
+        if is_daily == 1:
+            traffic_acc = traffic_history[0].traffic
+            day = traffic_history[0].time.astimezone(tz).day
+            for traffic in traffic_history:
+                if traffic is traffic_history[len(traffic_history)-1]:
+                    flow_result_json.append({'time': traffic.time.astimezone(tz).date(), 'traffic': traffic.traffic-traffic_acc})
 
-            elif traffic.time.astimezone(tz).day != day:
-                flow_result_json.append({'time': traffic.time.date(), 'traffic': traffic.traffic-traffic_acc})
-                traffic_acc = traffic.traffic
-                day = traffic.time.astimezone(tz).day
-    elif is_daily == 0:
-        for traffic in traffic_history:
-            flow_result_json.append({'time': traffic.time.date(), 'traffic': traffic.traffic})
-    result = json.dumps(flow_result_json, default=date_handler)
-    return HttpResponse(result, content_type="application/json")
+                elif traffic.time.astimezone(tz).day != day:
+                    flow_result_json.append({'time': traffic.time.date(), 'traffic': traffic.traffic-traffic_acc})
+                    traffic_acc = traffic.traffic
+                    day = traffic.time.astimezone(tz).day
+        elif is_daily == 0:
+            for traffic in traffic_history:
+                flow_result_json.append({'time': traffic.time.date(), 'traffic': traffic.traffic})
+        result = json.dumps(flow_result_json, default=date_handler)
+        return HttpResponse(result, content_type="application/json")
+    except Exception as e:
+        print(e)
+    return HttpResponse('failed')
 
 
 @login_required(login_url="/login/")
