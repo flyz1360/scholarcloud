@@ -76,6 +76,7 @@ DATABASES = {
         #'PASSWORD': 'Zstbj2013',
         'PASSWORD': 'thuproxy',
         'HOST': '127.0.0.1',
+        # 'HOST': '58.205.208.71',
         # 'PORT': '8779',
     }
 }

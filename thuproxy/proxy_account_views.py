@@ -15,6 +15,7 @@ import httplib2
 from uwsgidecorators import *
 from django.utils import timezone
 from urllib import request
+import pytz
 
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "djangowebsite.settings")
@@ -336,14 +337,21 @@ def ip_history(request):
 def get_flow_json(request):
     user_id = request.GET.get('userid')
     is_daily = int(request.GET.get('is_daily'))
-    traffic_history = Traffic.objects.filter(user_id=user_id)
+    month = timezone.datetime.strptime(timezone.now().strftime('%Y-%m'), '%Y-%m')
+    traffic_history = Traffic.objects.filter(user_id=30, time__gte=month)
     flow_result_json = list()
+    tz = pytz.timezone('Asia/Shanghai')
     if is_daily == 1:
         traffic_acc = traffic_history[0].traffic
+        day = traffic_history[0].time.astimezone(tz).day
         for traffic in traffic_history:
-            if traffic.time.hour == 15:
+            if traffic is traffic_history[len(traffic_history)-1]:
+                flow_result_json.append({'time': traffic.time.astimezone(tz).date(), 'traffic': traffic.traffic-traffic_acc})
+
+            elif traffic.time.astimezone(tz).day != day:
                 flow_result_json.append({'time': traffic.time.date(), 'traffic': traffic.traffic-traffic_acc})
                 traffic_acc = traffic.traffic
+                day = traffic.time.astimezone(tz).day
     elif is_daily == 0:
         for traffic in traffic_history:
             flow_result_json.append({'time': traffic.time.date(), 'traffic': traffic.traffic})
