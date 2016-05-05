@@ -337,16 +337,16 @@ def get_flow_json(request):
         flow_result_json = list()
         tz = pytz.timezone('Asia/Shanghai')
         if is_daily == 1:
-            traffic_acc = traffic_history[0].traffic
-            day = traffic_history[0].time.astimezone(tz).day
+            traffic_acc = 0
+            day = traffic_history[0].time.astimezone(tz).date()
             for traffic in traffic_history:
                 if traffic is traffic_history[len(traffic_history)-1]:
                     flow_result_json.append({'time': traffic.time.astimezone(tz).date(), 'traffic': traffic.traffic-traffic_acc})
 
-                elif traffic.time.astimezone(tz).day != day:
-                    flow_result_json.append({'time': traffic.time.date(), 'traffic': traffic.traffic-traffic_acc})
+                elif traffic.time.astimezone(tz).date() != day:
+                    flow_result_json.append({'time': day, 'traffic': traffic.traffic-traffic_acc})
                     traffic_acc = traffic.traffic
-                    day = traffic.time.astimezone(tz).day
+                    day = traffic.time.astimezone(tz).date()
         elif is_daily == 0:
             for traffic in traffic_history:
                 flow_result_json.append({'time': traffic.time.date(), 'traffic': traffic.traffic})
