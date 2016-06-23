@@ -242,7 +242,7 @@ def update_flow(num):
                     # 超流量
                     if float(accout.traffic) > ACCOUNT_TRAFFIC_LIMIT[int(accout.type)]:
                         close_port(int(accout.port), CLOSE_REASON['over_flow'])
-                    print('update '+str(accout.port)+' '+str(traffic)+' for '+str(accout.traffic))
+                    # print('update '+str(accout.port)+' '+str(traffic)+' for '+str(accout.traffic))
                     accout.save()
                     sock.close()
 
