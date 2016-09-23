@@ -399,6 +399,11 @@ def downgrade(request):
         return HttpResponse("accout_type_error")
     else:
         print("downgrade success: type ", downgrade_type)
+        today = datetime.date.today()
+        remain_day = proxyaccount.expired_date - today
+        extend_day = remain_day * (float(proxyaccount.type) / float(downgrade_type))
+
+        proxyaccount.expired_date = today + datetime.timedelta(int(extend_day.days))
         proxyaccount.type = downgrade_type
         proxyaccount.save()
     downgrade_port(proxyaccount.port, proxyaccount.type)
