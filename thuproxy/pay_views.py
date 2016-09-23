@@ -31,10 +31,24 @@ def alipay_apply(request, pay_type):
         if proxyaccount.type == 50:
             request.session["error"] = "upgrade"
             return HttpResponseRedirect('/homepage')
-        if datetime.datetime.now().date() <= proxyaccount.expired_date:
+        if datetime.datetime.now().date() < proxyaccount.expired_date:
             remain_time = proxyaccount.expired_date - datetime.datetime.now().date()
             proxyaccount.remain_time = int(remain_time.days)
+        elif datetime.datetime.now().date() >= proxyaccount.expired_date:
+            request.session["error"] = "date"
+            return HttpResponseRedirect('/homepage')
         return render_to_response('alipay_create_order_upgrade.html', locals(), context_instance=RequestContext(request))
+    elif pay_type == 'downgrade':
+        if proxyaccount.type == 1:
+            request.session["error"] = "downgrade"
+            return HttpResponseRedirect('/homepage')
+        if datetime.datetime.now().date() < proxyaccount.expired_date:
+            remain_time = proxyaccount.expired_date - datetime.datetime.now().date()
+            proxyaccount.remain_time = int(remain_time.days)
+        elif datetime.datetime.now().date() >= proxyaccount.expired_date:
+            request.session["error"] = "date"
+            return HttpResponseRedirect('/homepage')
+        return render_to_response('alipay_create_order_downgrade.html', locals(), context_instance=RequestContext(request))
     elif pay_type == 'continue':
         return render_to_response('alipay_create_order_continue.html', locals(), context_instance=RequestContext(request))
     else:
@@ -53,16 +67,19 @@ def alipay_create_orders(request):
     userLoginSuccess = request.user.is_authenticated()
     user = request.user
     proxyaccount = ProxyAccount.objects.get(user=request.user)
-    # todo
     m = request.POST['money']
     money = float(m) * RATE
     money = round(money, 2)
     pay_type = request.POST['pay_type']
-    month = request.POST['month']
-    today = timezone.now()
-    print(money, pay_type)
-    try:
+    if pay_type == 3:
+        day = request.POST['day']
+        pay = Pay(out_trade_no=uuid.uuid1().hex, user=user, total_fee=money, type=int(pay_type), month=int(day), status='U', create_date=today)
+    else:
+        month = request.POST['month']
         pay = Pay(out_trade_no=uuid.uuid1().hex, user=user, total_fee=money, type=int(pay_type), month=int(month), status='U', create_date=today)
+
+    today = timezone.now()
+    try:
         pay.save()
         params = {'out_trade_no':pay.out_trade_no, 'subject':u'清云加速', 'body':u'流量购买费用', 'total_fee':str(money)}
         total_fee = pay.total_fee
@@ -209,7 +226,7 @@ def alipay_callback(request):
                             return HttpResponse("accout_type_error")
                         if ACCOUNT_TRAFFIC_LIMIT[int(proxyaccount.type)] > proxyaccount.traffic:
                             reopen_port(proxyaccount.port)
-                        # todo 修改带宽
+                        # 修改带宽和流量
                         upgrade_port(proxyaccount.port, proxyaccount.type)
                     else:
                         pay.status = 'F'

@@ -133,6 +133,19 @@ def upgrade_port(port_num, account_type):
         print(e)
 
 
+def downgrade_port(port_num, account_type):
+    try:
+        address = ('166.111.80.96', 4127)
+        socket.setdefaulttimeout(30)
+        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        sock.connect(address)
+        data = 'downgrade@'+str(port_num)+','+str(account_type)+'\n'
+        sock.send(data.encode())
+        sock.close()
+    except socket.error as e:
+        print(e)
+
+
 def get_port_num():
     random_data = range(10001, 19999)
     while True:
@@ -373,3 +386,22 @@ def show_flows(request):
     user = request.user
     traffic_list = Traffic.objects.filter(user=user)
     return render_to_response('flow_history.html', locals(), context_instance=RequestContext(request))
+
+
+@login_required(login_url="/login/")
+def downgrade(request):
+    userLoginSuccess = request.user.is_authenticated()
+    user = request.user
+    proxyaccount = ProxyAccount.objects.get(user=request.user)
+    pay_type = request.POST['pay_type']
+    downgrade_type = int(request.POST['type'])
+    if downgrade_type not in {1, 5, 10, 20}:
+        return HttpResponse("accout_type_error")
+    else:
+        print("downgrade success: type ", downgrade_type)
+        proxyaccount.type = downgrade_type
+        proxyaccount.save()
+    downgrade_port(proxyaccount.port, proxyaccount.type)
+    return render_to_response('downgrade_success.html', locals(), context_instance=RequestContext(request))
+
+
