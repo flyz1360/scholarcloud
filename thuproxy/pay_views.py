@@ -67,15 +67,15 @@ def alipay_create_orders(request):
     money = float(m) * RATE
     money = round(money, 2)
     pay_type = request.POST['pay_type']
-    if pay_type == 3:
-        day = request.POST['day']
-        pay = Pay(out_trade_no=uuid.uuid1().hex, user=user, total_fee=money, type=int(pay_type), month=int(day), status='U', create_date=today)
-    else:
-        month = request.POST['month']
-        pay = Pay(out_trade_no=uuid.uuid1().hex, user=user, total_fee=money, type=int(pay_type), month=int(month), status='U', create_date=today)
-
     today = timezone.now()
     try:
+        if pay_type == 3:
+            day = request.POST['day']
+            pay = Pay(out_trade_no=uuid.uuid1().hex, user=user, total_fee=money, type=int(pay_type), month=int(day), status='U', create_date=today)
+        else:
+            month = request.POST['month']
+            pay = Pay(out_trade_no=uuid.uuid1().hex, user=user, total_fee=money, type=int(pay_type), month=int(month), status='U', create_date=today)
+   
         pay.save()
         params = {'out_trade_no':pay.out_trade_no, 'subject':u'清云加速', 'body':u'流量购买费用', 'total_fee':str(money)}
         total_fee = pay.total_fee
