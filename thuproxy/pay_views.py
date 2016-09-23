@@ -42,12 +42,8 @@ def alipay_apply(request, pay_type):
         if proxyaccount.type == 1:
             request.session["error"] = "downgrade"
             return HttpResponseRedirect('/homepage')
-        if datetime.datetime.now().date() < proxyaccount.expired_date:
-            remain_time = proxyaccount.expired_date - datetime.datetime.now().date()
-            proxyaccount.remain_time = int(remain_time.days)
-        elif datetime.datetime.now().date() >= proxyaccount.expired_date:
-            request.session["error"] = "date"
-            return HttpResponseRedirect('/homepage')
+        remain_time = proxyaccount.expired_date - datetime.datetime.now().date()
+        proxyaccount.remain_time = int(remain_time.days)
         return render_to_response('alipay_create_order_downgrade.html', locals(), context_instance=RequestContext(request))
     elif pay_type == 'continue':
         return render_to_response('alipay_create_order_continue.html', locals(), context_instance=RequestContext(request))
