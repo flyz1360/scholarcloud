@@ -143,6 +143,8 @@ def alipay_callback(request):
                     print('trade no ', trade_no)
                     total_fee = params['total_fee']
                     pay = Pay.objects.get(out_trade_no=out_trade_no)
+                    if pay is None:
+                        return HttpResponse("无此订单，请重新下单")
                     # todo all of return httpResponse
                     if pay.status == 'S':
                         return HttpResponse("S")
