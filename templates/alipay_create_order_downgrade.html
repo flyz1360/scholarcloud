@@ -1,26 +1,22 @@
 {% extends "base.html" %}
-
     {% block custom_js %}
         <script>
             $(document).ready(function() {
                 var types = new Array(1,5,10,20,50)
                 for (var type in types) {
-                    if (types[type] < {{ proxyaccount.type }}) {
+                    if (types[type] > {{ proxyaccount.type }}) {
                         $('#inlineRadio'+types[type]).attr('disabled',true)
                     }
                     if (types[type] == {{ proxyaccount.type }}) {
                         type = parseInt(type)
                         $('#inlineRadio'+types[type]).attr('disabled',true)
-                        $('#inlineRadio'+types[type+1]).attr('checked',true)
-                        var day = $('#day').val()
-                        $('#money').val((day*(types[type+1]-types[type])) / 30)
+                        $('#inlineRadio'+types[0]).attr('checked',true)
                     }
                 }
 
                 $("input[name=accoutType]").click(function(){
                     var type = $('input[name=accoutType]:checked').val()
-                    var day = $('#day').val()
-                    $('#money').val((day*(type-{{ proxyaccount.type}})) / 30)
+                    $('#type').val(type)
                 })
             })
         </script>
@@ -51,26 +47,20 @@
     </div>
 
 
-    <div class="form-group">
-        <lable class="col-xs-10 col-xs-offset-2 col-sm-3 col-md-2 control-label" >账户剩余天数：</lable>
 
-        <lable class="col-xs-1 col-xs-offset-2 col-sm-1 col-sm-offset-0 control-label" style="text-align: right">{{ proxyaccount.remain_time }}</lable>
-        <lable class="col-xs-1 control-label" style="text-align: left">天</lable>
-    </div>
 
-    <form method = "post" action="/alipay/submit">
+    <form method = "post" action="/account/downgrade">
         {% csrf_token %}
         <div class="form-group">
-            <lable class="col-xs-10 col-xs-offset-2 col-sm-3 col-md-2 control-label" >共需支付：</lable>
-            <div class="col-xs-4 col-xs-offset-2  col-sm-3 col-md-2 col-sm-offset-0">
-                <input class="form-control" id="money" type="text" name="money" value="0" readonly>
-            </div>
-            <lable class="control-label" style="text-align: left;padding-left: 15px;">元</lable>
-            <button class="btn btn-success" style="width: 80px; margin-left: 20px" type="submit">购买</button>
+            <lable class="col-xs-10 col-xs-offset-2 col-sm-3 col-md-2 control-label" >账户剩余天数：</lable>
+
+            <lable class="col-xs-1 col-xs-offset-2 col-sm-1 col-sm-offset-0 control-label" style="text-align: right">{{ proxyaccount.remain_time }}</lable>
+            <lable class="col-xs-1 control-label" style="text-align: left">天</lable>
+            <button class="btn btn-success" style="width: 80px; margin-left: 20px" type="submit">降级</button>
         </div>
 
-        <input type="hidden" name="pay_type" value=3>
-        <input type="hidden" id="day" name="day" value={{ proxyaccount.remain_time }}>
+        <input type="hidden" name="pay_type" value=4>
+        <input type="hidden" id="type" name="type" value=1>
     </form>
 </div>
 {% endblock %}

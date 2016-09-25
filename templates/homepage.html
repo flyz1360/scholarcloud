@@ -19,8 +19,14 @@
                     else if ('{{ error }}' == 'first_pay'){
                         alert('您已经不是第一次付款')
                     }
+                    else if ('{{ error }}' == 'date'){
+                        alert('您已欠费，请先续费')
+                    }
                     else if ('{{ error }}' == 'upgrade'){
                         alert('您的账户已经是最高级')
+                    }
+                    else if ('{{ error }}' == 'downgrade'){
+                        alert('您的账户已经是最低级')
                     }
                     else if ('{{ error }}' == 'repay' || '{{ error }}' == 'cancel'){
                         alert('查无此订单')
@@ -50,9 +56,9 @@
                 </thead>
                 <tbody>
                     <tr>
-                        <td>{{ proxyaccount.type }}元套餐 <a style="margin-left: 20px" href="/alipay/apply/upgrade"> 升级</a></td>
+                        <td>{{ proxyaccount.type }}元套餐 <a style="margin-left: 20px" href="/alipay/apply/upgrade"> 升级</a><a style="margin-left: 0px" href="/alipay/apply/downgrade"> 降级</a></td>
                         <td>{{ proxyaccount.remain_time }}天 <a style="margin-left: 20px" href="/alipay/apply/continue"> 续费</a></td>
-                        <td>{{ proxyaccount.traffic }} MB <a title="敬请期待" style="margin-left: 20px" href="/flow_history/"> 流量图</a></td>
+                        <td>{{ proxyaccount.traffic }} MB <a style="margin-left: 20px" href="/flow_history/"> 流量图</a></td>
                         <td>{{ proxyaccount.ip_address}}  <u style="float: right">{{ proxyaccount.city }}</u></td>
                     </tr>
                 </tbody>
