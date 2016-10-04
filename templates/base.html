@@ -61,14 +61,14 @@
 
         <div id="navbar" class="navbar-collapse collapse">
             <ul class="nav navbar-nav navbar-middle" style="width: 47%">
-                <li {% if pageName == "homepage" %}class="active"{% endif %} style="width: 33%"><a href="/homepage">账户管理</a></li>
-                <li {% if pageName == "guide" %}class="active"{% endif %} style="width: 33%"><a href="/guide">配置说明</a></li>
-                <li {% if pageName == "accoutTypes" %}class="active"{% endif %} style="width: 33%"><a href="/accoutTypes">账户类型</a></li>
+                <li {% if page_name == "homepage" %}class="active"{% endif %} style="width: 33%"><a href="/homepage">账户管理</a></li>
+                <li {% if page_name == "guide" %}class="active"{% endif %} style="width: 33%"><a href="/guide">配置说明</a></li>
+                <li {% if page_name == "account_types" %}class="active"{% endif %} style="width: 33%"><a href="/account_types">账户类型</a></li>
 {#                <li style="width: 50%"><a target="_blank" href="http://thucloud.com">云计算教学实验平台</a></li>#}
             </ul>
 
             <ul class="nav navbar-nav navbar-right"  style="width: 18%">
-                {% if userLoginSuccess == True %}
+                {% if is_user_login == True %}
                     <li id="fat-menu" class="dropdown">
                       <a id="drop3" href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
                         {{ user.username }}

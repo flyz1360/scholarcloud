@@ -40,7 +40,7 @@
     {% endblock %}
 
 {% block content %}
-    {% if proxyaccount.paydate == None %}
+    {% if proxy_account.paydate == None %}
         <p align="center">您尚未缴费，请点击<a href="/alipay/apply/first" >缴费</a></p>
 {#        <p align="center">或者<a href="/alipay/temp-apply" >内测缴费</a></p>#}
     {% else %}
@@ -56,27 +56,27 @@
                 </thead>
                 <tbody>
                     <tr>
-                        <td>{{ proxyaccount.type }}元套餐 <a style="margin-left: 20px" href="/alipay/apply/upgrade"> 升级</a><a style="margin-left: 0px" href="/alipay/apply/downgrade"> 降级</a></td>
-                        <td>{{ proxyaccount.remain_time }}天 <a style="margin-left: 20px" href="/alipay/apply/continue"> 续费</a></td>
-                        <td>{{ proxyaccount.traffic }} MB <a style="margin-left: 20px" href="/flow_history/"> 流量图</a></td>
-                        <td>{{ proxyaccount.ip_address}}  <u style="float: right">{{ proxyaccount.city }}</u></td>
+                        <td>{{ proxy_account.type }}元套餐 <a style="margin-left: 20px" href="/alipay/apply/upgrade"> 升级</a><a style="margin-left: 0px" href="/alipay/apply/downgrade"> 降级</a></td>
+                        <td>{{ proxy_account.remain_time }}天 <a style="margin-left: 20px" href="/alipay/apply/continue"> 续费</a></td>
+                        <td>{{ proxy_account.traffic }} MB <a style="margin-left: 20px" href="/flow_history/"> 流量图</a></td>
+                        <td>{{ proxy_account.ip_address}}  <u style="float: right">{{ proxy_account.city }}</u></td>
                     </tr>
                 </tbody>
             </table>
         </div>
-        {% if proxyaccount.type == 7 %}
+        {% if proxy_account.type == 7 %}
             <p align="center">您的账户为：<a href="/accoutTypes/" title="查看资费说明">体验用户</a></p>
-        {% elif proxyaccount.type == 8  %}
+        {% elif proxy_account.type == 8  %}
             <p align="center">您的账户为：<a href="/accoutTypes/" title="查看资费说明">VIP用户</a></p>
         {% endif %}
 
-        {% if proxyaccount.remain_time > 0 and proxyaccount.traffic < proxyaccount.traffic_limit%}
-            <p align="center">自动配置URL：<label>http://pac.scholar.thucloud.com/{{ proxyaccount.pac_no }}.pac</label></p>
+        {% if proxy_account.remain_time > 0 and proxy_account.traffic < proxy_account.traffic_limit%}
+            <p align="center">自动配置URL：<label>http://pac.scholar.thucloud.com/{{ proxy_account.pac_no }}.pac</label></p>
             <p align="center">详情请查看<a href="/guide">配置说明</a></p>
-        {% elif proxyaccount.remain_time == None%}
+        {% elif proxy_account.remain_time == None%}
             <p align="center">您已欠费</p>
             <p align="center">请点击<a href="/alipay/apply/continue">续费 </a></p>
-        {% elif proxyaccount.traffic >= proxyaccount.traffic_limit %}
+        {% elif proxy_account.traffic >= proxy_account.traffic_limit %}
             <p align="center">您已超过流量</p>
             <p align="center">请点击<a href="/alipay/apply/upgrade">升级 </a></p>
         {% endif %}

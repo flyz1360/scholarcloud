@@ -21,10 +21,10 @@ def register(request):
                 new_user.save()
                 proxy_account_list = ProxyAccount.objects.order_by("-port")
                 if len(proxy_account_list) == 0:
-                    proxyaccount = ProxyAccount(user=new_user, type=0, port=10001, traffic=0)
+                    proxy_account = ProxyAccount(user=new_user, type=0, port=10001, traffic=0)
                 else:
-                    proxyaccount = ProxyAccount(user=new_user, type=0, port=get_port_num(), traffic=0)
-                proxyaccount.save()
+                    proxy_account = ProxyAccount(user=new_user, type=0, port=get_port_num(), traffic=0)
+                proxy_account.save()
                 request.session['username'] = username
                 return HttpResponseRedirect('/')
             else:

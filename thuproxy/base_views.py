@@ -1,11 +1,10 @@
 #coding=utf-8
-from django.http import HttpResponse
 from django.shortcuts import render_to_response, RequestContext
 
 
 def index(request):
-    userLoginSuccess = request.user.is_authenticated()
-    if userLoginSuccess is True:
+    is_user_login = request.user.is_authenticated()
+    if is_user_login is True:
         user = request.user
     else:
         user = None
@@ -13,20 +12,20 @@ def index(request):
         username = request.session['username']
     else:
         username = ''
-    pageName = "index"
+    page_name = "index"
     return render_to_response('index.html', locals(), context_instance=RequestContext(request))
 
 
 def guide(request):
-    userLoginSuccess = request.user.is_authenticated()
+    is_user_login = request.user.is_authenticated()
     user = request.user
-    pageName = "guide"
+    page_name = "guide"
     return render_to_response('guide.html', locals(), context_instance=RequestContext(request))
 
 
-def accoutTypes(request):
-    userLoginSuccess = request.user.is_authenticated()
+def account_types(request):
+    is_user_login = request.user.is_authenticated()
     user = request.user
-    pageName = "accoutTypes"
-    return render_to_response('accoutTypes.html', locals(), context_instance=RequestContext(request))
+    page_name = "account_types"
+    return render_to_response('account_types.html', locals(), context_instance=RequestContext(request))
 

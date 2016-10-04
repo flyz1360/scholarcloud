@@ -5,10 +5,10 @@
             $(document).ready(function() {
                 var types = new Array(1,5,10,20,50)
                 for (var type in types) {
-                    if (types[type] < {{ proxyaccount.type }}) {
+                    if (types[type] < {{ proxy_account.type }}) {
                         $('#inlineRadio'+types[type]).attr('disabled',true)
                     }
-                    if (types[type] == {{ proxyaccount.type }}) {
+                    if (types[type] == {{ proxy_account.type }}) {
                         type = parseInt(type)
                         $('#inlineRadio'+types[type]).attr('disabled',true)
                         $('#inlineRadio'+types[type+1]).attr('checked',true)
@@ -20,7 +20,7 @@
                 $("input[name=accoutType]").click(function(){
                     var type = $('input[name=accoutType]:checked').val()
                     var day = $('#day').val()
-                    $('#money').val((day*(type-{{ proxyaccount.type}})) / 30)
+                    $('#money').val((day*(type-{{ proxy_account.type}})) / 30)
                 })
             })
         </script>
@@ -54,7 +54,7 @@
     <div class="form-group">
         <lable class="col-xs-10 col-xs-offset-2 col-sm-3 col-md-2 control-label" >账户剩余天数：</lable>
 
-        <lable class="col-xs-1 col-xs-offset-2 col-sm-1 col-sm-offset-0 control-label" style="text-align: right">{{ proxyaccount.remain_time }}</lable>
+        <lable class="col-xs-1 col-xs-offset-2 col-sm-1 col-sm-offset-0 control-label" style="text-align: right">{{ proxy_account.remain_time }}</lable>
         <lable class="col-xs-1 control-label" style="text-align: left">天</lable>
     </div>
 
@@ -70,7 +70,7 @@
         </div>
 
         <input type="hidden" name="pay_type" value=3>
-        <input type="hidden" id="day" name="day" value={{ proxyaccount.remain_time }}>
+        <input type="hidden" id="day" name="day" value={{ proxy_account.remain_time }}>
     </form>
 </div>
 {% endblock %}

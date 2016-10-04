@@ -4,10 +4,10 @@
             $(document).ready(function() {
                 var types = new Array(1,5,10,20,50)
                 for (var type in types) {
-                    if (types[type] > {{ proxyaccount.type }}) {
+                    if (types[type] > {{ proxy_account.type }}) {
                         $('#inlineRadio'+types[type]).attr('disabled',true)
                     }
-                    if (types[type] == {{ proxyaccount.type }}) {
+                    if (types[type] == {{ proxy_account.type }}) {
                         type = parseInt(type)
                         $('#inlineRadio'+types[type]).attr('disabled',true)
                         $('#inlineRadio'+types[0]).attr('checked',true)
@@ -54,7 +54,7 @@
         <div class="form-group">
             <lable class="col-xs-10 col-xs-offset-2 col-sm-3 col-md-2 control-label" >账户剩余天数：</lable>
 
-            <lable class="col-xs-1 col-xs-offset-2 col-sm-1 col-sm-offset-0 control-label" style="text-align: right">{{ proxyaccount.remain_time }}</lable>
+            <lable class="col-xs-1 col-xs-offset-2 col-sm-1 col-sm-offset-0 control-label" style="text-align: right">{{ proxy_account.remain_time }}</lable>
             <lable class="col-xs-1 control-label" style="text-align: left">天</lable>
             <button class="btn btn-success" style="width: 80px; margin-left: 20px" type="submit">降级</button>
         </div>
