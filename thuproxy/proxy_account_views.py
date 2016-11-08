@@ -16,6 +16,8 @@ from uwsgidecorators import *
 from django.utils import timezone
 from urllib import request
 import pytz
+from django.utils import timezone
+import urllib.request
 
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "djangowebsite.settings")
@@ -32,10 +34,10 @@ CLOSE_REASON = {'over_flow': 1, 'expired': 2}
 
 def script_lz(request, script_name):
     if script_name == 'create_pac':
-        proxyaccount_id = request.GET.get('pid')
-        proxyaccount = ProxyAccount.objects.get(id=proxyaccount_id)
-        if proxyaccount:
-            create_pac(proxyaccount)
+        proxy_account_id = request.GET.get('pid')
+        proxy_account = ProxyAccount.objects.get(id=proxy_account_id)
+        if proxy_account:
+            create_pac(proxy_account)
         else:
             return HttpResponse('failed')
     elif script_name == 'regen_pac':
@@ -45,32 +47,32 @@ def script_lz(request, script_name):
         account_type = request.GET.get('accountType')
         open_listen_port(port_num, account_type)
     elif script_name == 'update_flow':
-        # todo
         update_flow(1)
     elif script_name == 'flush_flow':
         flush_flow(1)
     elif script_name == 'judge_expire':
         judge_expire(1)
     elif script_name == 'test':
-        judge_expire()
+        judge_expire(1)
     else:
         return HttpResponse('no such script')
     return HttpResponse('success')
 
 
-def create_pac(proxyaccount):
-    template_pac = open("./static/myproxy.pac", "r+")
-    d = template_pac.read()
-    pac_no = uuid.uuid1()
-    print("pac_no", pac_no)
-    proxyaccount.pac_no = pac_no
-    proxyaccount.save()
-    d = d.replace("4128", str(proxyaccount.port))
-    user_pac = open('/data/pac/'+str(pac_no)+'.pac', 'w+')
-    user_pac.write(d)
-    user_pac.close()
+def create_pac(proxy_account):
+    template_pac_file = open("./static/myproxy.pac", "r+")
+    pac_content = template_pac_file.read()
+    pac_port_no = uuid.uuid1()
+    print("**** create pac: pac_no", pac_port_no)
+    proxy_account.pac_no = pac_port_no
+    proxy_account.save()
+    pac_content = pac_content.replace("4128", str(proxy_account.port))
+    user_pac_file = open('/data/pac/'+str(pac_port_no)+'.pac', 'w+')
+    user_pac_file.write(pac_content)
+    user_pac_file.close()
 
 
+# in case the pac files in server are lost
 def regen_pac():
     account_list = ProxyAccount.objects.filter(pac_no__isnull=False)
     print(len(account_list))
@@ -83,6 +85,7 @@ def regen_pac():
         user_pac.close()
 
 
+# open the port on proxy server
 def open_listen_port(port_num, account_type):
     try:
         address = ('166.111.80.96', 4127)
@@ -96,7 +99,7 @@ def open_listen_port(port_num, account_type):
         print(e)
 
 
-# java服务还在，只需删去iptables中根据端口号drop规则，不需流量、带宽等
+# reopen the port on proxy server, for cases such as 欠费后重新缴费
 def reopen_port(port_num):
     try:
         address = ('166.111.80.96', 4127)
@@ -171,7 +174,7 @@ def get_ip_address(port_num):
         message = message.decode('utf-8')
         tmp = message.split('@')
         result['address'] = tmp[0]
-        result['city'] = request.unquote(tmp[1])
+        result['city'] = urllib.request.unquote(tmp[1])
         sock.close()
     except socket.error as e:
         print(e)
@@ -196,7 +199,7 @@ def get_ip_address_list(port_num):
                 result = dict()
                 result['address'] = tmp[0]
                 result['time'] = tmp[1]
-                result['city'] = request.unquote(tmp[2])
+                result['city'] = urllib.request.unquote(tmp[2])
                 ip_address_list.append(result)
         sock.close()
     except socket.error as e:
@@ -213,55 +216,57 @@ def update_flow_cron():
 def update_flow(num):
     try:
         print(datetime.datetime.now())
-        print('log update flow')
+        print('****update flow log')
         account_list = ProxyAccount.objects.filter(pac_no__isnull=False)
         if account_list is not None:
             address = ('166.111.80.96', 4127)
             socket.setdefaulttimeout(30)
 
-            for accout in account_list:
+            for account in account_list:
                 try:
                     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
                     sock.connect(address)
-                    data = 'getflow@'+str(accout.port)+'\n'
+                    data = 'getflow@'+str(account.port)+'\n'
                     sock.send(data.encode())
                     message = sock.recv(1024)
                     traffic = float(message)
                     # todo 已经超过流量，超过100M设置惩罚
-                    if float(accout.traffic) > ACCOUNT_TRAFFIC_LIMIT[int(accout.type)]:
-                        if (float(accout.traffic) - float(ACCOUNT_TRAFFIC_LIMIT[int(accout.type)])) > 100.0:
-                            if not os.path.exists('/data/over_traffic/'+str(accout.port)):
-                                f = open('/data/over_traffic/'+str(accout.port), 'a')
-                                f.write(str(accout.port)+','+str(traffic)+','+str(accout.traffic))
+                    if float(account.traffic) > ACCOUNT_TRAFFIC_LIMIT[int(account.type)]:
+                        if (float(account.traffic) - float(ACCOUNT_TRAFFIC_LIMIT[int(account.type)])) > 100.0:
+                            if not os.path.exists('/data/over_traffic/'+str(account.port)):
+                                f = open('/data/over_traffic/'+str(account.port), 'a')
+                                f.write(str(account.port)+','+str(traffic)+','+str(account.traffic))
                                 f.close()
                         continue
 
-                    if traffic > float(accout.traffic):
-                        accout.traffic = traffic
-                    elif traffic < float(accout.traffic):
+                    if traffic > float(account.traffic):
+                        account.traffic = traffic
+                    # 因为某些原因proxy server重启后导致脚本记录的流量小于用户当前流量
+                    # 需要请求上一次脚本记录的流量值做delta更新
+                    elif traffic < float(account.traffic):
                         sock1 = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
                         sock1.connect(address)
-                        data = 'preflow@'+str(accout.port)+'\n'
+                        data = 'preflow@'+str(account.port)+'\n'
                         sock1.send(data.encode())
                         message = sock1.recv(1024)
                         sock1.close()
                         traffic_pre = float(message)
                         print('pre flow '+str(traffic_pre))
                         if traffic >= traffic_pre:
-                            accout.traffic = float(accout.traffic) + (traffic - traffic_pre)
+                            account.traffic = float(account.traffic) + (traffic - traffic_pre)
                         else:
-                            accout.traffic = float(accout.traffic) + traffic
+                            account.traffic = float(account.traffic) + traffic
 
                     # 超流量
-                    if float(accout.traffic) > ACCOUNT_TRAFFIC_LIMIT[int(accout.type)]:
-                        close_port(int(accout.port), CLOSE_REASON['over_flow'])
+                    if float(account.traffic) > ACCOUNT_TRAFFIC_LIMIT[int(account.type)]:
+                        close_port(int(account.port), CLOSE_REASON['over_flow'])
                     # print('update '+str(accout.port)+' '+str(traffic)+' for '+str(accout.traffic))
-                    accout.save()
+                    account.save()
                     sock.close()
 
                     # 记录到数据库
                     now = timezone.now()
-                    t = Traffic(user=accout.user, traffic=accout.traffic, time=now)
+                    t = Traffic(user=account.user, traffic=account.traffic, time=now)
                     t.save()
                 except Exception as e:
                     print('error', e)
@@ -269,13 +274,12 @@ def update_flow(num):
         print('error', e)
 
 
-# abandoned
+# 月初对所有账户的流量清零
 def flush_flow_cron():
     http_client = httplib2.HTTPConnectionWithTimeout('localhost', 8000, timeout=30)
     http_client.request('GET', '/script_lz/flush_flow/')
 
 
-# todo 数据库中traffic清零同时reopen所有port（其实也可不用，那边iptables-F了）
 @cron(1, 0, 1, -1, -1)
 def flush_flow(num):
     account_list = ProxyAccount.objects.filter(pac_no__isnull=False)
@@ -285,7 +289,7 @@ def flush_flow(num):
             account.save()
 
 
-# abandoned
+# 每天判断一次是否过期
 def judge_expire_cron():
     http_client = httplib2.HTTPConnectionWithTimeout('localhost', 8000, timeout=30)
     http_client.request('GET', '/script_lz/judge_expire/')
@@ -308,31 +312,31 @@ def judge_expire(num):
 @login_required(login_url="/login/")
 def homepage(request):
     try:
-        userLoginSuccess = request.user.is_authenticated()
+        is_user_login = request.user.is_authenticated()
         user = request.user
-        pageName = "homepage"
-        proxyaccount = ProxyAccount.objects.get(user=request.user)
+        page_name = "homepage"
+        proxy_account = ProxyAccount.objects.get(user=request.user)
         if "error" in request.session:
             error = request.session['error']
             del request.session['error']
 
         # 是否付过费
-        if proxyaccount.type != 0:
-            if datetime.datetime.now().date() <= proxyaccount.expired_date:
-                remain_time = proxyaccount.expired_date - datetime.datetime.now().date()
-                proxyaccount.remain_time = int(remain_time.days)
+        if proxy_account.type != 0:
+            if datetime.datetime.now().date() <= proxy_account.expired_date:
+                remain_time = proxy_account.expired_date - datetime.datetime.now().date()
+                proxy_account.remain_time = int(remain_time.days)
             else:
-                proxyaccount.remain_time = None
+                proxy_account.remain_time = None
 
-            proxyaccount.traffic_limit = ACCOUNT_TRAFFIC_LIMIT[int(proxyaccount.type)]
-            proxyaccount.traffic = round(proxyaccount.traffic, 2)
-            result = get_ip_address(proxyaccount.port)
-            proxyaccount.ip_address = result['address']
-            proxyaccount.city = result['city']
+            proxy_account.traffic_limit = ACCOUNT_TRAFFIC_LIMIT[int(proxy_account.type)]
+            proxy_account.traffic = round(proxy_account.traffic, 2)
+            result = get_ip_address(proxy_account.port)
+            proxy_account.ip_address = result['address']
+            proxy_account.city = result['city']
         else:
-            proxyaccount.remain_time = None
-            proxyaccount.traffic = 0
-            proxyaccount.ip_address = None
+            proxy_account.remain_time = None
+            proxy_account.traffic = 0
+            proxy_account.ip_address = None
 
         return render_to_response('homepage.html', locals(), context_instance=RequestContext(request))
     except Exception as e:
@@ -342,10 +346,10 @@ def homepage(request):
 
 @login_required(login_url="/login/")
 def ip_history(request):
-    userLoginSuccess = request.user.is_authenticated()
-    pageName = "homepage"
-    proxyaccount = ProxyAccount.objects.get(user=request.user)
-    ip_list = get_ip_address_list(proxyaccount.port)
+    is_user_login = request.user.is_authenticated()
+    page_name = "homepage"
+    proxy_account = ProxyAccount.objects.get(user=request.user)
+    ip_list = get_ip_address_list(proxy_account.port)
     return render_to_response('ip_history.html', locals(), context_instance=RequestContext(request))
 
 
@@ -363,7 +367,8 @@ def get_flow_json(request):
             day = traffic_history[0].time.astimezone(tz).date()
             for traffic in traffic_history:
                 if traffic is traffic_history[len(traffic_history)-1]:
-                    flow_result_json.append({'time': traffic.time.astimezone(tz).date(), 'traffic': traffic.traffic-traffic_acc})
+                    flow_result_json.append({'time': traffic.time.astimezone(tz).date(),
+                                             'traffic': traffic.traffic-traffic_acc})
 
                 elif traffic.time.astimezone(tz).date() != day:
                     flow_result_json.append({'time': day, 'traffic': traffic.traffic-traffic_acc})
@@ -372,6 +377,12 @@ def get_flow_json(request):
         elif is_daily == 0:
             for traffic in traffic_history:
                 flow_result_json.append({'time': traffic.time.date(), 'traffic': traffic.traffic})
+
+        date_handler = lambda obj: (
+            obj.isoformat()
+            if isinstance(obj, datetime.datetime) or isinstance(obj, datetime.date)
+            else None
+        )
         result = json.dumps(flow_result_json, default=date_handler)
         return HttpResponse(result, content_type="application/json")
     except Exception as e:
@@ -381,17 +392,17 @@ def get_flow_json(request):
 
 @login_required(login_url="/login/")
 def show_orders(request):
-    userLoginSuccess = request.user.is_authenticated()
-    pageName = "homepage"
+    is_user_login = request.user.is_authenticated()
+    page_name = "homepage"
     user = request.user
     pay_list = Pay.objects.filter(user_id=user.id)
-    return render_to_response('show_orders.html', locals(), context_instance=RequestContext(request))
+    return render_to_response('orders_list.html', locals(), context_instance=RequestContext(request))
 
 
 @login_required(login_url="/login/")
 def show_flows(request):
-    userLoginSuccess = request.user.is_authenticated()
-    pageName = "homepage"
+    is_user_login = request.user.is_authenticated()
+    page_name = "homepage"
     user = request.user
     traffic_list = Traffic.objects.filter(user=user)
     return render_to_response('flow_history.html', locals(), context_instance=RequestContext(request))
@@ -399,23 +410,21 @@ def show_flows(request):
 
 @login_required(login_url="/login/")
 def downgrade(request):
-    userLoginSuccess = request.user.is_authenticated()
+    is_user_login = request.user.is_authenticated()
     user = request.user
-    proxyaccount = ProxyAccount.objects.get(user=request.user)
+    proxy_account = ProxyAccount.objects.get(user=request.user)
     pay_type = request.POST['pay_type']
     downgrade_type = int(request.POST['type'])
     if downgrade_type not in {1, 5, 10, 20}:
-        return HttpResponse("accout_type_error")
+        return HttpResponse("account_type_error")
     else:
         print("downgrade success: type ", downgrade_type)
         today = datetime.date.today()
-        remain_day = proxyaccount.expired_date - today
-        extend_day = remain_day * (float(proxyaccount.type) / float(downgrade_type))
+        remain_day = proxy_account.expired_date - today
+        extend_day = remain_day * (float(proxy_account.type) / float(downgrade_type))
 
-        proxyaccount.expired_date = today + datetime.timedelta(int(extend_day.days))
-        proxyaccount.type = downgrade_type
-        proxyaccount.save()
-    downgrade_port(proxyaccount.port, proxyaccount.type)
+        proxy_account.expired_date = today + datetime.timedelta(int(extend_day.days))
+        proxy_account.type = downgrade_type
+        proxy_account.save()
+    downgrade_port(proxy_account.port, proxy_account.type)
     return render_to_response('downgrade_success.html', locals(), context_instance=RequestContext(request))
-
-

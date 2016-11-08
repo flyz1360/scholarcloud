@@ -5,7 +5,7 @@
     margin-right: auto;
 }
 
-.unlogged  .index-img {
+ .index-img {
     float: left;
 }
 
@@ -15,10 +15,27 @@
     margin: 5px 20px
 }
 
-.logged .index-img img{
-    display: block;
-    margin-left: auto;
-    margin-right: auto;
+.notice{
+    width: 220px;
+    float: right;
+    margin: 5px 20px;
+}
+
+td p{
+    color: gray;
+    float: right
+}
+
+td {
+    font-size: 14px;
+}
+
+td strong{
+    color: red;
+}
+
+.no-part-border {
+  border-right: 1px solid transparent !important;
 }
 
 .clear {

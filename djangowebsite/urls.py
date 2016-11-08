@@ -20,9 +20,8 @@ from django.contrib import admin
 urlpatterns = patterns('thuproxy.base_views',
                        ('^$', 'index'),
                        ('^guide/$', 'guide'),
-                       ('^accoutTypes/$', 'accoutTypes'),
-                       (r'^admin/', include(admin.site.urls)),
-)
+                       ('^account_types/$', 'account_types'),
+                       (r'^admin/', include(admin.site.urls)))
 
 urlpatterns += patterns('thuproxy.user_views',
                         ('^register/$', 'register'),
@@ -32,24 +31,21 @@ urlpatterns += patterns('thuproxy.user_views',
                         )
 
 urlpatterns += patterns('thuproxy.pay_views',
-                        (r'^alipay/apply/(.+)$','alipay_apply'),
-                        (r'^alipay/submit$','alipay_create_orders'),
-                        # (r'^alipay/submit$','alipay_test'),
-                        (r'^alipay/repay/(.+)$','alipay_repay_orders'),
-                        (r'^alipay/callback$','alipay_callback'),
-                        (r'^alipay/success$','alipay_success'),
-                        (r'^alipay/temp-apply$','alipay_apply_temp'),
-                        ('^dcode/$', 'dcode'),
-                        ('^inputDcode/$', 'inputDcode'),
+                        (r'^alipay/apply/(.+)$', 'alipay_apply'),
+                        (r'^alipay/submit$', 'alipay_create_orders'),
+                        # (r'^alipay/submit$', 'alipay_test'),
+                        (r'^alipay/repay/(.+)$', 'alipay_repay_orders'),
+                        (r'^alipay/callback$', 'alipay_callback'),
+                        (r'^alipay/success$', 'alipay_success'),
                         (r'^alipay/cancel/(.+)$', 'alipay_cancel')
                         )
 
 urlpatterns += patterns('thuproxy.proxy_account_views',
-                        (r'^homepage/$','homepage'),
-                        (r'^ip_history/$','ip_history'),
-                        (r'^flow_history/$','show_flows'),
+                        (r'^homepage/$', 'homepage'),
+                        (r'^ip_history/$', 'ip_history'),
+                        (r'^flow_history/$', 'show_flows'),
                         ('^getFlow_json/$', 'get_flow_json'),
-                        (r'^script_lz/(.+)/$','script_lz'),
-                        (r'^orders/$','show_orders'),
-                         (r'^account/downgrade$','downgrade'),
+                        (r'^script_lz/(.+)/$', 'script_lz'),
+                        (r'^orders/$', 'show_orders'),
+                        (r'^account/downgrade$', 'downgrade'),
                         )

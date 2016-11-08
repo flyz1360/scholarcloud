@@ -3,7 +3,7 @@
     {% block custom_js %}
         <script>
             $(document).ready(function() {
-                $('#inlineRadio'+{{ proxyaccount.type }}).attr('checked',true)
+                $('#inlineRadio'+{{ proxy_account.type }}).attr('checked',true)
                 var type = $('input[name=accoutType]:checked').val()
                 $('#money').val(type)
 
