@@ -19,6 +19,7 @@ from django.contrib import admin
 
 urlpatterns = patterns('thuproxy.base_views',
                        ('^$', 'index'),
+                       ('^show_login/$', 'show_login'),
                        ('^guide/$', 'guide'),
                        ('^account_types/$', 'account_types'),
                        (r'^admin/', include(admin.site.urls)))

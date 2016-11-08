@@ -3,15 +3,13 @@ from django.shortcuts import render_to_response, RequestContext
 
 
 def index(request):
-    is_user_login = request.user.is_authenticated()
-    if is_user_login is True:
-        user = request.user
-    else:
-        user = None
-    if 'username' in request.session:
-        username = request.session['username']
-    else:
-        username = ''
+    need_show_login = False
+    page_name = "index"
+    return render_to_response('index.html', locals(), context_instance=RequestContext(request))
+
+
+def show_login(request):
+    need_show_login = True
     page_name = "index"
     return render_to_response('index.html', locals(), context_instance=RequestContext(request))
 

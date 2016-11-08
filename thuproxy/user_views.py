@@ -53,6 +53,7 @@ def login(request):
                 auth.login(request, user)
                 return HttpResponseRedirect('/homepage/')
     error = True
+    need_show_login = True
     return render_to_response('index.html', locals(), context_instance=RequestContext(request))
 
 
