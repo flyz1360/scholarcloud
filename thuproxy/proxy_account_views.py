@@ -28,7 +28,8 @@ date_handler = lambda obj: (
     else None
 )
 
-ACCOUNT_TRAFFIC_LIMIT = {1: 100, 5: 1000, 10: 10000, 20: 25000, 50: 100000}
+# 流量限制
+ACCOUNT_TRAFFIC_LIMIT = {1: 100, 5: 5000, 10: 10000, 20: 25000, 50: 100000}
 CLOSE_REASON = {'over_flow': 1, 'expired': 2}
 
 
