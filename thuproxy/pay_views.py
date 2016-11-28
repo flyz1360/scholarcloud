@@ -249,8 +249,9 @@ def alipay_callback(request):
                     return HttpResponse("success")
                 except Exception as e:
                     print(e)
-            return HttpResponse("fail")
+        return HttpResponse("fail")
     except Exception as e:
+        return HttpResponse("fail")
         print(e)
 
 
