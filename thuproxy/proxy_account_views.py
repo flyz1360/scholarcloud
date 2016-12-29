@@ -314,7 +314,11 @@ def homepage(request):
             proxy_account.traffic = round(proxy_account.traffic, 2)
             result = get_ip_address(proxy_account.port)
             proxy_account.ip_address = result['address']
-            proxy_account.city = result['city']
+            city = result['city']
+            if len(city) > 10:
+                proxy_account.city = result['city']
+            else:
+                proxy_account.city = '未知'
         else:
             proxy_account.remain_time = None
             proxy_account.traffic = 0
