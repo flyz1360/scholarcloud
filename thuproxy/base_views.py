@@ -4,6 +4,8 @@ from django.shortcuts import render_to_response, RequestContext
 
 def index(request):
     need_show_login = False
+    is_user_login = request.user.is_authenticated()
+    user = request.user
     page_name = "index"
     return render_to_response('index.html', locals(), context_instance=RequestContext(request))
 
