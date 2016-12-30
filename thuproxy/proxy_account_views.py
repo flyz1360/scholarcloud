@@ -160,6 +160,9 @@ def get_ip_address(port_num):
         tmp = message.split('@')
         result['address'] = tmp[0]
         result['city'] = urllib.request.unquote(tmp[1])
+        # 异常处理
+        if len(result['city']) > 10:
+            result['city'] = '北京市'
         sock.close()
     except socket.error as e:
         print(e)
@@ -185,6 +188,8 @@ def get_ip_address_list(port_num):
                 result['address'] = tmp[0]
                 result['time'] = tmp[1]
                 result['city'] = urllib.request.unquote(tmp[2])
+                if len(result['city']) > 10:
+                    result['city'] = '北京市'
                 ip_address_list.append(result)
         sock.close()
     except socket.error as e:
@@ -314,11 +319,7 @@ def homepage(request):
             proxy_account.traffic = round(proxy_account.traffic, 2)
             result = get_ip_address(proxy_account.port)
             proxy_account.ip_address = result['address']
-            city = result['city']
-            if len(city) > 10:
-                proxy_account.city = result['city']
-            else:
-                proxy_account.city = '未知'
+            proxy_account.city = result['city']
         else:
             proxy_account.remain_time = None
             proxy_account.traffic = 0
