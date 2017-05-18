@@ -9,7 +9,7 @@
     {% endblock %}
 
 {% block content %}
-    <div class="col-sm-4 col-md-3 col-sm-offset-4 col-xs-6 col-xs-offset-3">
+    <div class="col-sm-4 col-md-4 col-sm-offset-4 col-xs-6 col-xs-offset-3">
         {% if errors %}
             <ul>
                 {% for error in errors %}
@@ -21,19 +21,20 @@
         <form action="/register/" id="user-info-form" method="post" align="center">
             {% csrf_token %}
             <div class="form-group">
-                <input type="text" name="username" class="form-control" id="username" placeholder="用户名" required="">
+                
+                <input type="text" name="username" class="form-control" id="username" placeholder="用户名/Username" required="">
                 <label class="error" id="user-name-label" for="username"></label>
             </div>
             <div class="form-group">
-                <input type="password" name="password" class="form-control" id="password" placeholder="密码">
+                <input type="password" name="password" class="form-control" id="password" placeholder="密码/Password">
             </div>
             <div class="form-group">
-                <input type="password" name="confirmPassword" class="form-control" id="confirmPassword" placeholder="重复密码">
+                <input type="password" name="confirmPassword" class="form-control" id="confirmPassword" placeholder="重复密码/Repeat Password">
             </div>
             <div class="form-group">
-                <input type="email" name="email" class="form-control" id="email" placeholder="邮箱">
+                <input type="email" name="email" class="form-control" id="email" placeholder="邮箱/Email">
             </div>
-            <button class="btn btn-info btn-block">注册</button>
+            <button class="btn btn-info btn-block">注册/Sign Up</button>
         </form>
     </div>
 {% endblock %}

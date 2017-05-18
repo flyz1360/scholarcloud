@@ -24,10 +24,9 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = 'ep=o3o4rv%@(&h9j*pb^$gcva3z7_346($sqoygradd%y&&nq+'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = ['*']
-
 
 # Application definition
 
@@ -114,7 +113,8 @@ logging.basicConfig(
 )
 
 CRONJOBS = [
-    ('58 * * * *', 'thuproxy.proxy_account_views.update_flow_cron'),
-    ('57 23 * * *', 'thuproxy.proxy_account_views.judge_expire_cron'),
-    ('01 00 1 * *', 'thuproxy.proxy_account_views.flush_flow_cron'),
+#    ('58 * * * *', 'thuproxy.proxy_account_views.update_flow_cron'),
+#    ('57 23 * * *', 'thuproxy.proxy_account_views.judge_expire_cron'),
+#    ('01 00 1 * *', 'thuproxy.proxy_account_views.flush_flow_cron'),
 ]
+

@@ -1,5 +1,7 @@
 #coding=utf-8
-from django.http import HttpResponse
+import django
+django.setup()
+from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render_to_response, RequestContext
 from django.contrib.auth.decorators import login_required
 from thuproxy.models import *
@@ -10,9 +12,21 @@ import socket
 import random
 import os
 import httplib2
+from uwsgidecorators import *
+from django.utils import timezone
+from urllib import request
 import pytz
 from django.utils import timezone
 import urllib.request
+
+
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "djangowebsite.settings")
+date_handler = lambda obj: (
+    obj.isoformat()
+    if isinstance(obj, datetime.datetime)
+    or isinstance(obj, datetime.date)
+    else None
+)
 
 # 流量限制
 ACCOUNT_TRAFFIC_LIMIT = {1: 100, 5: 5000, 10: 10000, 20: 25000, 50: 100000}
@@ -34,11 +48,13 @@ def script_lz(request, script_name):
         account_type = request.GET.get('accountType')
         open_listen_port(port_num, account_type)
     elif script_name == 'update_flow':
-        update_flow()
+        update_flow(1)
     elif script_name == 'flush_flow':
-        flush_flow()
+        flush_flow(1)
     elif script_name == 'judge_expire':
-        judge_expire()
+        judge_expire(1)
+    elif script_name == 'test':
+        judge_expire(1)
     else:
         return HttpResponse('no such script')
     return HttpResponse('success')
@@ -202,7 +218,8 @@ def update_flow_cron():
     http_client.request('GET', '/script_lz/update_flow/')
 
 
-def update_flow():
+@cron(58, -1, -1, -1, -1)
+def update_flow(num):
     try:
         print(datetime.datetime.now())
         print('****update flow log')
@@ -269,7 +286,8 @@ def flush_flow_cron():
     http_client.request('GET', '/script_lz/flush_flow/')
 
 
-def flush_flow():
+@cron(1, 0, 1, -1, -1)
+def flush_flow(num):
     account_list = ProxyAccount.objects.filter(pac_no__isnull=False)
     if account_list is not None:
         for account in account_list:
@@ -283,7 +301,8 @@ def judge_expire_cron():
     http_client.request('GET', '/script_lz/judge_expire/')
 
 
-def judge_expire():
+@cron(57, 23, -1, -1, -1)
+def judge_expire(num):
     try:
         today = datetime.date.today()
         print(today)
