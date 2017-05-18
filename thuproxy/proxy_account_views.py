@@ -434,4 +434,3 @@ def downgrade(request):
         proxy_account.save()
     downgrade_port(proxy_account.port, proxy_account.type)
     return render_to_response('downgrade_success.html', locals(), context_instance=RequestContext(request))
-萨斯打发士大夫玩儿全网通4
