@@ -246,6 +246,7 @@ def update_flow(num):
                         continue
 
                     if traffic > float(account.traffic):
+                        print('flow '+str(traffic))
                         account.traffic = traffic
                     # 因为某些原因proxy server重启后导致脚本记录的流量小于用户当前流量
                     # 需要请求上一次脚本记录的流量值做delta更新
