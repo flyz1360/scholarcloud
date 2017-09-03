@@ -163,7 +163,7 @@ def get_port_num():
 
 
 def get_ip_address(port_num):
-    result = {}
+    result = {"address": "", "city": ""}
     try:
         address = ('166.111.80.96', 4127)
         socket.setdefaulttimeout(30)
@@ -180,7 +180,7 @@ def get_ip_address(port_num):
         if len(result['city']) > 10:
             result['city'] = '北京市'
         sock.close()
-    except socket.error as e:
+    except Exception as e:
         print(e)
     return result
 
