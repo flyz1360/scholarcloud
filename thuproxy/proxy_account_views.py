@@ -27,6 +27,8 @@ date_handler = lambda obj: (
     or isinstance(obj, datetime.date)
     else None
 )
+manager_ip = "118.190.151.42"
+manager_port = 4127
 
 # 流量限制
 ACCOUNT_TRAFFIC_LIMIT = {1: 100, 5: 5000, 10: 10000, 20: 25000, 50: 100000}
@@ -89,7 +91,7 @@ def regen_pac():
 # open the port on proxy server
 def open_listen_port(port_num, account_type):
     try:
-        address = ('166.111.80.96', 4127)
+        address = (manager_ip, manager_port)
         socket.setdefaulttimeout(30)
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         sock.connect(address)
@@ -103,7 +105,7 @@ def open_listen_port(port_num, account_type):
 # reopen the port on proxy server, for cases such as 欠费后重新缴费
 def reopen_port(port_num):
     try:
-        address = ('166.111.80.96', 4127)
+        address = (manager_ip, manager_port)
         socket.setdefaulttimeout(30)
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         sock.connect(address)
@@ -117,7 +119,7 @@ def reopen_port(port_num):
 # 超过流量或者过期
 def close_port(port_num, reason):
     try:
-        address = ('166.111.80.96', 4127)
+        address = (manager_ip, manager_port)
         socket.setdefaulttimeout(30)
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         sock.connect(address)
@@ -130,7 +132,7 @@ def close_port(port_num, reason):
 
 def upgrade_port(port_num, account_type):
     try:
-        address = ('166.111.80.96', 4127)
+        address = (manager_ip, manager_port)
         socket.setdefaulttimeout(30)
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         sock.connect(address)
@@ -143,7 +145,7 @@ def upgrade_port(port_num, account_type):
 
 def downgrade_port(port_num, account_type):
     try:
-        address = ('166.111.80.96', 4127)
+        address = (manager_ip, manager_port)
         socket.setdefaulttimeout(30)
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         sock.connect(address)
@@ -165,7 +167,7 @@ def get_port_num():
 def get_ip_address(port_num):
     result = {"address": "", "city": ""}
     try:
-        address = ('166.111.80.96', 4127)
+        address = (manager_ip, manager_port)
         socket.setdefaulttimeout(30)
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         sock.connect(address)
@@ -188,7 +190,7 @@ def get_ip_address(port_num):
 def get_ip_address_list(port_num):
     ip_address_list = []
     try:
-        address = ('166.111.80.96', 4127)
+        address = (manager_ip, manager_port)
         socket.setdefaulttimeout(30)
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         sock.connect(address)
@@ -225,7 +227,7 @@ def update_flow(num):
         print('****update flow log')
         account_list = ProxyAccount.objects.filter(pac_no__isnull=False)
         if account_list is not None:
-            address = ('166.111.80.96', 4127)
+            address = (manager_ip, manager_port)
             socket.setdefaulttimeout(30)
 
             for account in account_list:
