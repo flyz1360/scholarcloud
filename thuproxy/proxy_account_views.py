@@ -176,11 +176,8 @@ def get_ip_address(port_num):
         message = sock.recv(1024)
         message = message.decode('utf-8')
         tmp = message.split('@')
-        result['address'] = tmp[0]
-        result['city'] = urllib.request.unquote(tmp[1])
-        # 异常处理
-        if len(result['city']) > 10:
-            result['city'] = '北京市'
+        result['address'] = tmp[0]  # means ip address
+        result['city'] = tmp[1]
         sock.close()
     except Exception as e:
         print(e)
@@ -205,9 +202,7 @@ def get_ip_address_list(port_num):
                 result = dict()
                 result['address'] = tmp[0]
                 result['time'] = tmp[1]
-                result['city'] = urllib.request.unquote(tmp[2])
-                if len(result['city']) > 10:
-                    result['city'] = '北京市'
+                result['city'] = tmp[2]
                 ip_address_list.append(result)
         sock.close()
     except socket.error as e:
