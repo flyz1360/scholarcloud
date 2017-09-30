@@ -27,7 +27,7 @@ date_handler = lambda obj: (
     or isinstance(obj, datetime.date)
     else None
 )
-manager_ip = "118.190.151.42"
+manager_ip = "166.111.80.96"
 manager_port = 4127
 
 # 流量限制
