@@ -215,6 +215,7 @@ def update_flow_cron():
     http_client.request('GET', '/script_lz/update_flow/')
 
 
+# 每小时的58分钟执行任务
 @cron(58, -1, -1, -1, -1)
 def update_flow(num):
     try:
@@ -241,10 +242,12 @@ def update_flow(num):
                                 f.write(str(account.port)+','+str(traffic)+','+str(account.traffic))
                                 f.close()
                         continue
-
+                    
+                    # 直接用得到的流量表示记录的流量
                     if traffic > float(account.traffic):
                         print('flow '+str(traffic))
                         account.traffic = traffic
+
                     # 因为某些原因proxy server重启后导致脚本记录的流量小于用户当前流量
                     # 需要请求上一次脚本记录的流量值做delta更新
                     elif traffic < float(account.traffic):
